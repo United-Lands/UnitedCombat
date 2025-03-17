@@ -1,0 +1,11 @@
+name: UnitedCombat
+version: '3.0.0'
+main: org.unitedlands.pvp.UnitedCombat
+api-version: 1.17
+authors: [ Maroon28 ]
+depend: [ Towny ]
+softdepend: [ PlaceholderAPI ]
+commands:
+  pvp:
+     description: Main PVP command. Used to enable and disable pvp status.
+     usage: /pvp on | off | status [player]

@@ -1,0 +1,8 @@
+org\unitedlands\combat\listeners\TownyListener.class
+org\unitedlands\combat\player\PvpPlayer.class
+org\unitedlands\combat\util\Utils.class
+org\unitedlands\combat\hooks\Placeholders.class
+org\unitedlands\combat\listeners\PlayerListener.class
+org\unitedlands\combat\player\Status.class
+org\unitedlands\combat\UnitedCombat.class
+org\unitedlands\combat\commands\PvPCmd.class
