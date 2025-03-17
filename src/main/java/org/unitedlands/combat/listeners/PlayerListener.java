@@ -36,6 +36,7 @@ import org.unitedlands.combat.util.Utils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -88,7 +89,7 @@ public class PlayerListener implements Listener {
             // Notify the mayor if they're online
             Resident mayor = town.getMayor();
             if (mayor.isOnline()) {
-                mayor.getPlayer().sendMessage(Utils.getMessage("kicked-out-of-neutrality-mayor"));
+                Objects.requireNonNull(mayor.getPlayer()).sendMessage(Utils.getMessage("kicked-out-of-neutrality-mayor"));
             }
         }
         if (town.hasNation()) {

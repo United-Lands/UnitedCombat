@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.unitedlands.combat.player.PvpPlayer;
 import org.unitedlands.combat.util.Utils;
 
+import java.util.Objects;
+
 import static org.unitedlands.combat.util.Utils.getMessage;
 import static org.unitedlands.combat.util.Utils.sendMessageList;
 
@@ -31,7 +33,7 @@ public class PvPCmd implements CommandExecutor {
         if (args.length == 3) {
             if (args[0].equalsIgnoreCase("setHostility")) {
                 if (player.hasPermission("united.pvp.admin")) {
-                    pvpPlayer = new PvpPlayer(Bukkit.getPlayer(args[1]));
+                    pvpPlayer = new PvpPlayer(Objects.requireNonNull(Bukkit.getPlayer(args[1])));
                     pvpPlayer.setHostility(Integer.parseInt(args[2]));
                     pvpPlayer.updatePlayerHostility();
                     player.sendMessage("Hostility set to " + args[2]);

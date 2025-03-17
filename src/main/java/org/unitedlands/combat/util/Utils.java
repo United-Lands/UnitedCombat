@@ -17,11 +17,9 @@ import java.util.Objects;
 
 public class Utils {
 
-    private final UnitedCombat unitedPVP;
     public static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     public Utils(UnitedCombat unitedPVP) {
-        this.unitedPVP = unitedPVP;
     }
 
     public static boolean isPvP(EntityDamageByEntityEvent event) {
@@ -33,8 +31,7 @@ public class Utils {
                 return true;
             if (damager instanceof Projectile) {
                 final ProjectileSource projSource = ((Projectile) damager).getShooter();
-                if (projSource instanceof Player) {
-                    final Entity shooter = (Entity) projSource;
+                if (projSource instanceof Player shooter) {
                     if (!shooter.equals(target) && !shooter.hasMetadata("NPC"))
                         return !(event.getDamage() == 0);
                 }

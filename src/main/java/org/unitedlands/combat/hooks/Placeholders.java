@@ -3,22 +3,23 @@ package org.unitedlands.combat.hooks;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.unitedlands.combat.player.PvpPlayer;
 
 public class Placeholders extends PlaceholderExpansion {
 
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return "Maroon28";
     }
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "unitedpvp";
     }
 
     @Override
-    public String getVersion() {
+    public @NotNull String getVersion() {
         return "1.0.0";
     }
 
@@ -28,7 +29,7 @@ public class Placeholders extends PlaceholderExpansion {
     }
 
     @Override
-    public String onRequest(OfflinePlayer player, String params) {
+    public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player.getPlayer() != null) {
             PvpPlayer pvpPlayer = new PvpPlayer((Player) player);
             if (params.equalsIgnoreCase("status")) {

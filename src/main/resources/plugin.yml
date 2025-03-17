@@ -1,8 +1,9 @@
 name: UnitedCombat
 version: '${project.version}'
 main: org.unitedlands.pvp.UnitedCombat
-api-version: 1.17
-authors: [ Maroon28 ]
+api-version: 1.21
+authors: [Maroon28]
+contributors: [Litning11, Theriel_]
 depend: [ Towny ]
 softdepend: [ PlaceholderAPI ]
 commands:
