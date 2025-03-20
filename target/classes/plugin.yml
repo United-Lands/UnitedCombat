@@ -1,5 +1,5 @@
 name: UnitedCombat
-version: '3.0.2'
+version: '3.0.3'
 main: org.unitedlands.combat.UnitedCombat
 api-version: 1.21
 authors: [Maroon28]
@@ -7,6 +7,10 @@ contributors: [Litning11, Theriel_]
 depend: [ Towny ]
 softdepend: [ PlaceholderAPI ]
 commands:
+  unitedcombat:
+    description: Reloads the plugin config.
+    usage: /unitedcombat reload
+    permission: united.combat.admin
   pvp:
      description: Main PVP command. Used to enable and disable pvp status.
      usage: /pvp on | off | status [player]

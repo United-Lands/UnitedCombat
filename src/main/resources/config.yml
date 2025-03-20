@@ -38,6 +38,9 @@ hostility-colour-stages:
 
 messages:
   prefix: "§c§lU§f§lL §7§lCombat §8§l» "
+  reload: "§2Plugin reloaded."
+  invalid-command: "§cInvalid command usage."
+  no-permission: '§2You don''t have permission to perform this command.'
   help-message:
     - '§l§cUnited §fCombat'
     - '§8/pvp degrade [On/Off] §7Toggle hostility decrease every new Towny day.'
@@ -45,7 +48,6 @@ messages:
     - '§8/pvp on §7Disable your new player immunity.'
   in-combat: '§cYou can''t use that command while in combat!'
   pvp-disabled: '§cPvP disabled!'
-  no-permission: '§cNo permission!'
   pvp-enabled: '§aPvP enabled.'
   pvp-degrade-enabled: '§aEnabled hostility degradation.'
   pvp-degrade-disabled: '§cDisabled hostility degradation.'
