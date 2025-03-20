@@ -1,5 +1,19 @@
 ##############################################
 # +----------------------------------------+ #
+# |               Explosions               | #
+# +----------------------------------------+ #
+##############################################
+
+# This section covers all the explosion tweaks for PvP.
+
+end-crystals:
+  # Toggle on or off vanilla crystal behaviour.
+  nerf-crystal-damage: true
+  # The damage the crystal will do, in %. 0 will do no damage, 50 will do half damage, and 100 will do full damage.
+  crystal-damage-percent: 0
+
+##############################################
+# +----------------------------------------+ #
 # |                Hostility               | #
 # +----------------------------------------+ #
 ##############################################
