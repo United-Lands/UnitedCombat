@@ -148,7 +148,7 @@ public class PvpPlayer {
 
     public String getIconHex(int hostility) {
         FileConfiguration config = unitedCombat.getConfig();
-        return config.getString("hostility-color-stages." + hostility);
+        return config.getString("hostility-colour-stages." + hostility);
     }
 
     public boolean isDegradable() {
