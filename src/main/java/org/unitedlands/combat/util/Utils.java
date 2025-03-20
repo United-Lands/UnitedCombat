@@ -1,7 +1,7 @@
 package org.unitedlands.combat.util;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
@@ -17,9 +17,7 @@ import java.util.Objects;
 
 public class Utils {
 
-    public static final MiniMessage miniMessage = MiniMessage.miniMessage();
-
-    public Utils(UnitedCombat unitedPVP) {
+    public Utils() {
     }
 
     public static boolean isPvP(EntityDamageByEntityEvent event) {
@@ -50,13 +48,19 @@ public class Utils {
         FileConfiguration config = getUnitedPvP().getConfig();
         String prefix = config.getString("messages.prefix");
         String configuredMessage = prefix + config.getString("messages." + message);
-        return miniMessage.deserialize(Objects.requireNonNullElseGet(configuredMessage, () -> "<red>Message <yellow>" + message + "<red> could not be found in the config file!"));
+        return LegacyComponentSerializer.legacySection().deserialize(
+                Objects.requireNonNullElseGet(
+                        configuredMessage,
+                        () -> "§cMessage §e§l" + message + "§c could not be found in the config file!"
+                )
+        );
     }
+
     public static void sendMessageList(Player player, String listName) {
         FileConfiguration config = getUnitedPvP().getConfig();
-        @NotNull List<String> configuredMessage = config.getStringList(listName);
-        for (String line: configuredMessage) {
-            player.sendMessage(miniMessage.deserialize(Objects.requireNonNull(line)));
+        List<String> configuredMessage = config.getStringList(listName);
+        for (String line : configuredMessage) {
+            player.sendMessage(LegacyComponentSerializer.legacySection().deserialize(Objects.requireNonNull(line)));
         }
     }
 

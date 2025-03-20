@@ -1,6 +1,6 @@
 name: UnitedCombat
 version: '${project.version}'
-main: org.unitedlands.pvp.UnitedCombat
+main: org.unitedlands.combat.UnitedCombat
 api-version: 1.21
 authors: [Maroon28]
 contributors: [Litning11, Theriel_]

@@ -1,6 +1,6 @@
 name: UnitedCombat
-version: '3.0.0'
-main: org.unitedlands.pvp.UnitedCombat
+version: '3.0.2'
+main: org.unitedlands.combat.UnitedCombat
 api-version: 1.21
 authors: [Maroon28]
 contributors: [Litning11, Theriel_]
