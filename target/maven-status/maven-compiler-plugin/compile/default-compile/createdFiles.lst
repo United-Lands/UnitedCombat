@@ -7,3 +7,4 @@ org\unitedlands\combat\listeners\PlayerListener.class
 org\unitedlands\combat\player\Status.class
 org\unitedlands\combat\UnitedCombat.class
 org\unitedlands\combat\commands\PvPCmd.class
+org\unitedlands\combat\listeners\ExplosionListener.class
