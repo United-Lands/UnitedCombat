@@ -46,14 +46,12 @@ public class ExplosionListener implements Listener {
         if (clickedBlock == null || clickedBlock.getType() != Material.RESPAWN_ANCHOR) return;
         if (event.getItem() == null || event.getItem().getType() != Material.GLOWSTONE) return;
         if (clickedBlock.getWorld().getEnvironment() == World.Environment.NETHER) return;
+        if (config.getBoolean("respawn-anchors.nerf-anchor-damage", false)) return;
 
         // Retrieve the respawn anchor block data.
         BlockData data = clickedBlock.getBlockData();
-        if (!(data instanceof RespawnAnchor anchor)) return;
+        if (!(data instanceof RespawnAnchor)) return;
 
-        // If the anchor is already charged with 4 or more charges, cancel.
-        if (anchor.getCharges() >= 4) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(true);
     }
 }
