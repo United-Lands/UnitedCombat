@@ -1,5 +1,6 @@
 package org.unitedlands.combat.listeners;
 
+import com.google.common.collect.Multimap;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.event.player.PlayerKilledPlayerEvent;
 import com.palmergames.bukkit.towny.object.Nation;
@@ -13,6 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Registry;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EnderCrystal;
@@ -29,7 +34,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.inventory.ItemStack;
 import org.unitedlands.combat.UnitedCombat;
 import org.unitedlands.combat.player.PvpPlayer;
 import org.unitedlands.combat.util.Utils;
@@ -268,6 +276,52 @@ public class PlayerListener implements Listener {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if(arrow.getCustomEffects().size() > 1) arrow.clearCustomEffects();
     }
+
+
+   // Attribute swap fix (taken from https://github.com/AutumnVN/hit-swap-fix/)
+
+    // Listens to changes to the item held by a player and refreshes attributes to
+    // prevent the exploit in bug MC-28289
+
+    @EventHandler
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        if (event.getNewSlot() >= 0 && event.getNewSlot() < 9 && event.getNewSlot() != event.getPreviousSlot()) {
+            event.getPlayer().resetCooldown();
+            refreshAttributes(event.getPlayer(), event.getPlayer().getInventory().getItem(event.getNewSlot()));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        event.getPlayer().resetCooldown();
+        refreshAttributes(event.getPlayer(), event.getMainHandItem());
+    }
+
+    private void refreshAttributes(Player player, ItemStack itemStack) {
+        if (itemStack == null)
+            return;
+
+        Multimap<Attribute, AttributeModifier> itemModifiers;
+
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getAttributeModifiers() != null) {
+            itemModifiers = itemStack.getItemMeta().getAttributeModifiers();
+        } else {
+            itemModifiers = itemStack.getType().getDefaultAttributeModifiers();
+        }
+
+        for (Attribute attribute : Registry.ATTRIBUTE) {
+            AttributeInstance attributeInstance = player.getAttribute(attribute);
+            if (attributeInstance != null) {
+                itemModifiers.get(attribute).stream().findFirst().ifPresent(modifier -> {
+                    attributeInstance.removeModifier(modifier);
+                    attributeInstance.addTransientModifier(modifier);
+                });
+            }
+        }
+    }
+
+
+    // Helper methods
 
     private Player getAttacker(Entity damager) {
         if (damager instanceof Projectile) {
