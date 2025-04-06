@@ -16,6 +16,12 @@ respawn-anchors:
   # Toggle on or off vanilla anchor behaviour.
   nerf-anchor-damage: true
 
+minecarts:
+  # Toggle on or off vanilla minecart behaviour.
+  nerf-minecart-damage: true
+  # The damage the minecart will do, in %. 0 will do no damage, 50 will do half damage, and 100 will do full damage.
+  minecart-damage-percent: 0
+
 ##############################################
 # +----------------------------------------+ #
 # |                Hostility               | #
