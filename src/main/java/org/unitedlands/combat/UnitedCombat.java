@@ -6,6 +6,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.unitedlands.combat.commands.AdminCmd;
 import org.unitedlands.combat.commands.PvPCmd;
 import org.unitedlands.combat.commands.ReloadCmd;
 import org.unitedlands.combat.hooks.Placeholders;
@@ -22,17 +23,24 @@ public final class UnitedCombat extends JavaPlugin {
     }
 
     // Helper method to register all commands with an executor and tab completer.
-    private void registerCommand(CommandExecutor executor, TabCompleter completer) {
-        Objects.requireNonNull(getCommand("unitedcombat"), "Command " + "unitedcombat" + " is not defined in plugin.yml.").setExecutor(executor);
-        Objects.requireNonNull(getCommand("unitedcombat")).setTabCompleter(completer);
+    private void registerCommand(String commandName, CommandExecutor executor, TabCompleter completer) {
+        Objects.requireNonNull(getCommand(commandName), "Command " + commandName + " is not defined in plugin.yml.").setExecutor(executor);
+        Objects.requireNonNull(getCommand(commandName)).setTabCompleter(completer);
     }
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         registerListeners();
+
         ReloadCmd reloadCmd = new ReloadCmd(this);
-        registerCommand(reloadCmd, reloadCmd);
+        registerCommand("unitedcombat", reloadCmd, reloadCmd);
+
+        AdminCmd adminCmd = new AdminCmd(this);
+        registerCommand("combatadmin", adminCmd, adminCmd);
+
+        PvPCmd pvpCmd = new PvPCmd();
+        registerCommand("pvp", pvpCmd, pvpCmd);
     }
 
     private void registerListeners() {
@@ -41,7 +49,6 @@ public final class UnitedCombat extends JavaPlugin {
         pluginManager.registerEvents(new PlayerListener(this), this);
         pluginManager.registerEvents(new TownyListener(this), this);
         pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
-        Objects.requireNonNull(getCommand("pvp")).setExecutor(new PvPCmd());
 
         // PlaceholderAPI Expansion Register
         if (pluginManager.getPlugin("PlaceholderAPI") != null) {
