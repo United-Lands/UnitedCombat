@@ -11,6 +11,9 @@ commands:
     description: Reloads the plugin config.
     usage: /unitedcombat reload
     permission: united.combat.admin
+  combatadmin:
+    description: Admin commands for UnitedCombat
+    aliases: [ca]
+    permission: united.combat.admin
   pvp:
-     description: Main PVP command. Used to enable and disable pvp status.
-     usage: /pvp on | off | status [player]
+     description: Main PVP command. Used to enable and disable pvp status. 
