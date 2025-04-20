@@ -32,10 +32,6 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
     @Nullable
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
             @NotNull String @NotNull [] args) {
-        if (!sender.hasPermission("united.combat.admin")) {
-            // Return no suggestions if no permission.
-            return Collections.emptyList();
-        }
 
         List<String> options = null;
         String input = args[args.length - 1];
@@ -48,7 +44,8 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
                 options = toggleCompletes;
         }
 
-        List<String> completions = null;
+        // Send a list with an empty string to prevent Minecraft showing a list of player names by default
+        List<String> completions = Arrays.asList("");
         if (options != null) {
             completions = options.stream().filter(s -> s.toLowerCase().startsWith(input.toLowerCase()))
                     .collect(Collectors.toList());
@@ -63,21 +60,14 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
 
         Player player = (Player) sender;
         PvpPlayer pvpPlayer = new PvpPlayer(player);
-        if (args.length == 0) {
-            sendMessageList(player, "messages.help-message");
-            return true;
-        }
 
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("status")) {
                 returnPvPStatus(player, player);
                 return true;
-            }
-            if (args[0].equalsIgnoreCase("mute")) {
+            } else if (args[0].equalsIgnoreCase("mute")) {
                 setNotification(player, !hasNotification(player));
-            }
-
-            if (args[0].equals("on")) {
+            } else if (args[0].equals("on")) {
                 if (pvpPlayer.isImmune()) {
                     pvpPlayer.expireImmunity();
                     player.sendMessage(getMessage("immunity-removed"));
@@ -85,16 +75,23 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
                 }
                 player.sendMessage(getMessage("you-are-not-immune"));
             }
+            else {
+                sendMessageList(player, "messages.help-message");
+                return true;
+            }
         } else if (args.length == 2) {
             if (args[0].equals("degrade")) {
                 if (args[1].equals("on")) {
                     pvpPlayer.setDegradable(true);
                     player.sendMessage(getMessage("pvp-degrade-enabled"));
                     return true;
-                }
-                if (args[1].equals("off")) {
+                } else if (args[1].equals("off")) {
                     pvpPlayer.setDegradable(false);
                     player.sendMessage(getMessage("pvp-degrade-disabled"));
+                    return true;
+                }
+                else {
+                    sendMessageList(player, "messages.help-message");
                     return true;
                 }
             } else if (args[0].equals("status")) {
@@ -106,7 +103,13 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
                 }
                 returnPvPStatus(player, otherPlayer);
                 return true;
+            } else {
+                sendMessageList(player, "messages.help-message");
+                return true;
             }
+        } else {
+            sendMessageList(player, "messages.help-message");
+            return true;
         }
 
         return false;

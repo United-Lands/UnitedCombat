@@ -14,6 +14,7 @@ import org.unitedlands.combat.player.PvpPlayer;
 import org.unitedlands.combat.util.Utils;
 
 import static org.unitedlands.combat.util.Utils.getMessage;
+import static org.unitedlands.combat.util.Utils.sendMessageList;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,12 +49,16 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         } else if (args.length == 2) {
             options = subcommandCompletes;
         } else if (args.length == 3) {
-            // Only degrade needs additional options
             if (args[1].equalsIgnoreCase("degrade"))
                 options = toggleCompletes;
+            else if (args[1].equalsIgnoreCase("sethostility")) {
+                options = Arrays.asList("[<value 1-21>]");
+            }
         }
 
-        List<String> completions = null;
+        // Send a list with an empty string to prevent Minecraft showing a list of
+        // player names by default
+        List<String> completions = Arrays.asList("");
         if (options != null) {
             completions = options.stream().filter(s -> s.toLowerCase().startsWith(input.toLowerCase()))
                     .collect(Collectors.toList());
@@ -73,14 +78,14 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         }
 
         // We need at least one username and one subcommand
-        if (args.length < 2)
+        if (args.length < 2) {
+            sendMessageList((Player) sender, "messages.admin-help-message");
             return true;
+        }
 
         // Get the subject player the command is used on
         OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
         if (!player.hasPlayedBefore()) {
-            plugin.getLogger().info("Unknown user.");
-
             sender.sendMessage(Utils.getMessage("unknown-player"));
             return true;
         }
@@ -98,12 +103,17 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                     pvpPlayer.setDegradable(true);
                     sender.sendMessage(getMessage("admin-pvp-degrade-enabled"));
                     return true;
-                }
-                if (args[2].equalsIgnoreCase("off")) {
+                } else if (args[2].equalsIgnoreCase("off")) {
                     pvpPlayer.setDegradable(false);
                     sender.sendMessage(getMessage("admin-pvp-degrade-disabled"));
                     return true;
+                } else {
+                    sendMessageList((Player) sender, "messages.admin-help-message");
+                    return true;
                 }
+            } else {
+                sendMessageList((Player)sender, "messages.admin-help-message");
+                return true;    
             }
         } else if (args.length == 2) {
             if (args[1].equals("forcepvp")) {
@@ -111,10 +121,17 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                     pvpPlayer.expireImmunity();
                     sender.sendMessage(getMessage("admin-immunity-removed"));
                     return true;
+                } else {
+                    sender.sendMessage(getMessage("admin-player-not-immune"));
+                    return true;
                 }
+            } else {
+                sendMessageList((Player)sender, "messages.admin-help-message");
+                return true;    
             }
+        } else {
+            sendMessageList((Player) sender, "messages.admin-help-message");
+            return true;
         }
-
-        return true;
     }
 }
