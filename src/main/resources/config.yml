@@ -54,6 +54,29 @@ hostility-colour-stages:
 
 ##############################################
 # +----------------------------------------+ #
+# |          Attribute swapping            | #
+# +----------------------------------------+ #
+##############################################
+
+# List of items that should trigger updating attributes immediately upon 
+# quickbar change to fix e.g. breach swapping 
+attr-swap-items:
+- WOODEN_SWORD
+- STONE_SWORD
+- IRON_SWORD
+- GOLDEN_SWORD
+- DIAMOND_SWORD
+- NETHERITE_SWORD
+- WOODEN_AXE
+- STONE_AXE
+- IRON_AXE
+- GOLDEN_AXE
+- DIAMOND_AXE
+- NETHERITE_AXE
+- MACE
+
+##############################################
+# +----------------------------------------+ #
 # |                Language                | #
 # +----------------------------------------+ #
 ##############################################
