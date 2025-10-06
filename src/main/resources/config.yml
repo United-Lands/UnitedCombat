@@ -28,6 +28,10 @@ minecarts:
 # +----------------------------------------+ #
 ##############################################
 
+hostility-exempt-worlds:
+  - 'world_arena1'
+  - 'world_arena2'
+
 hostility-colour-stages:
   0: '#E6850B'
   1: '#E6850B'

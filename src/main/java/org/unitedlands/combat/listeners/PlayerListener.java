@@ -10,11 +10,7 @@ import de.jeff_media.angelchest.AngelChest;
 import de.jeff_media.angelchest.events.AngelChestSpawnEvent;
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Registry;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -89,7 +85,7 @@ public class PlayerListener implements Listener {
             return;
         PvpPlayer pvpPlayer = new PvpPlayer(player);
         // Method was called, but player in question was not hostile.
-        if (!pvpPlayer.isHostile() || !pvpPlayer.isAggressive())
+        if (!pvpPlayer.isHostile() && !pvpPlayer.isAggressive())
             return;
 
         // Kick them out and notify them
@@ -146,6 +142,12 @@ public class PlayerListener implements Listener {
     public void onPlayerKillPlayer(PlayerKilledPlayerEvent event) {
         Player killer = event.getKiller();
         Player victim = event.getVictim();
+
+        // Don't increase hostility in exempted worlds.
+        var exempt = unitedCombat.getConfig().getStringList("hostility-exempt-worlds");
+        String worldName = killer.getWorld().getName();
+        if (exempt.contains(worldName))
+            return;
 
         PvpPlayer killerPvP = new PvpPlayer(killer);
         PvpPlayer victimPvP = new PvpPlayer(victim);
@@ -244,22 +246,29 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerDeathByCrystal(PlayerDeathEvent event) {
-        if (event.getEntity() instanceof EnderCrystal crystal) {
-            // This crystal is not registered.
-            if (!crystalMap.containsKey(crystal))
-                return;
-            Player originalPlacer = Bukkit.getPlayer(crystalMap.get(crystal));
-            // Player might be null
-            if (originalPlacer == null)
-                return;
-            // Player might've killed themselves by accident, don't do anything;
-            if (originalPlacer.equals(event.getPlayer()))
-                return;
+        Player victim = event.getEntity();
 
-            // Increase the hostility of whoever placed the crystal.
-            PvpPlayer pvpPlacer = new PvpPlayer(originalPlacer);
-            pvpPlacer.setHostility(pvpPlacer.getHostility() + 1);
-        }
+        // Was the last damage caused by an entity?
+        var last = victim.getLastDamageCause();
+        if (!(last instanceof EntityDamageByEntityEvent edbe)) return;
+
+        // Was that entity an ender crystal?
+        if (!(edbe.getDamager() instanceof EnderCrystal crystal)) return;
+
+        // Exempt defined worlds
+        var exempt = unitedCombat.getConfig().getStringList("hostility-exempt-worlds");
+        if (exempt.contains(victim.getWorld().getName())) return;
+
+        // Is the crystal registered to a placer?
+        UUID placerId = crystalMap.get(crystal);
+        if (placerId == null) return;
+
+        Player placer = Bukkit.getPlayer(placerId);
+        if (placer == null || placer.equals(victim)) return; // ignore suicide or offline placer.
+
+        // Increase hostility.
+        PvpPlayer pvpPlacer = new PvpPlayer(placer);
+        pvpPlacer.setHostility(pvpPlacer.getHostility() + 1);
     }
 
     @EventHandler

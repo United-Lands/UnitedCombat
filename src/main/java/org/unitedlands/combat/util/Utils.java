@@ -17,9 +17,6 @@ import java.util.Objects;
 
 public class Utils {
 
-    public Utils() {
-    }
-
     public static boolean isPvP(EntityDamageByEntityEvent event) {
         final Entity damager = event.getDamager();
         final Entity target = event.getEntity();
