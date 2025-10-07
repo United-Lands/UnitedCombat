@@ -13,6 +13,7 @@ import org.unitedlands.combat.hooks.Placeholders;
 import org.unitedlands.combat.listeners.ExplosionListener;
 import org.unitedlands.combat.listeners.PlayerListener;
 import org.unitedlands.combat.listeners.TownyListener;
+import org.unitedlands.combat.tagger.CombatTagManager;
 
 import java.util.Objects;
 
@@ -28,9 +29,12 @@ public final class UnitedCombat extends JavaPlugin {
         Objects.requireNonNull(getCommand(commandName)).setTabCompleter(completer);
     }
 
+    private CombatTagManager combatTagManager;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        combatTagManager = new CombatTagManager(this);
         registerListeners();
 
         ReloadCmd reloadCmd = new ReloadCmd(this);
@@ -41,6 +45,7 @@ public final class UnitedCombat extends JavaPlugin {
 
         PvPCmd pvpCmd = new PvPCmd();
         registerCommand("pvp", pvpCmd, pvpCmd);
+
     }
 
     private void registerListeners() {
@@ -64,6 +69,7 @@ public final class UnitedCombat extends JavaPlugin {
         pluginManager.registerEvents(new PlayerListener(this), this);
         pluginManager.registerEvents(new TownyListener(this), this);
         pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
+        combatTagManager.reload();
         getLogger().info("Plugin configuration reloaded.");
     }
 
