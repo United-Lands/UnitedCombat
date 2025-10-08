@@ -191,5 +191,5 @@ messages:
 # |              Combat Tagging                 | #
 # +---------------------------------------------+ #
 
-combat-tagged: '§cYou are now in combat! Do not log out.'
-combat-tagged-blocked-command: '§cYou cannot use that command in combat.'
+  combat-tagged: '§cYou are now in combat! Do not log out.'
+  combat-tagged-blocked-command: '§cYou cannot use that command in combat.'

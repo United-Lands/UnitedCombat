@@ -25,8 +25,9 @@ public class CombatTagListener implements Listener {
     }
 
     // Tag for combat when taking PvP damage, attacker and victim.
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDamage(EntityDamageByEntityEvent e) {
+
         if (!Utils.isPvP(e)) return;
 
         final Entity ent = e.getEntity();
@@ -42,11 +43,19 @@ public class CombatTagListener implements Listener {
 
         if (attacker == null) return;
 
+        final boolean victimWasTagged = tags.isTagged(victim);
+        final boolean attackerWasTagged = tags.isTagged(attacker);
+
         tags.tag(victim, attacker);
         bossbar.showFor(victim, attacker);
 
-        final boolean victimWasTagged = tags.isTagged(victim);
-        final boolean attackerWasTagged = tags.isTagged(attacker);
+        Utils.getUnitedPvP().getLogger().info(
+                String.format(" %s tagged %s for combat in world %s)",
+                        attacker.getName(),
+                        victim.getName(),
+                        victim.getWorld().getName()
+                )
+        );
 
         if (!victimWasTagged && tags.isTagged(victim)) {
             victim.sendMessage(Utils.getMessage("combat-tagged"));

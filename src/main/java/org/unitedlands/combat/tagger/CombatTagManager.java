@@ -53,6 +53,7 @@ public final class CombatTagManager {
 
     // Tag a player.
     public void tag(Player... players) {
+
         if (!enabled || players == null)
             return;
 
@@ -60,6 +61,7 @@ public final class CombatTagManager {
                 + TimeUnit.SECONDS.toMillis(durationSeconds);
 
         for (Player p : players) {
+
             if (p == null)
                 continue;
 
