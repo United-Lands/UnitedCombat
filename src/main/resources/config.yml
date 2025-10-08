@@ -41,6 +41,21 @@ combat_tagger:
   combat-log-commands:
     - 'warn %player_name% You have been warned for logging out in combat.'
     - 'kill %player_name%'
+  # Settings for the bossbar that appears to players who are in combat.
+  bossbar:
+    # Enable to disable the boss bar function.
+    enabled: true
+    # Text displayed within the bossbar.
+    title: "§cIn Combat (§e§l%seconds%s§c)"
+    # Bossbar colour, only supports:
+    # PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
+    colour: "RED"
+    # Boss bar styling, only supports:
+    # SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+    style: "SOLID"
+    # How long to linger the bar after it's finished (for a smooth transition)
+    # Measured in milliseconds, default is 1000
+    linger: 1000
 
 ##############################################
 # +----------------------------------------+ #

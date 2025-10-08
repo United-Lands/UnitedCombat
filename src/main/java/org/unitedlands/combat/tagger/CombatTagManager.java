@@ -86,7 +86,6 @@ public final class CombatTagManager {
         }
 
         return true;
-
     }
 
     //  Check how long the combat tag has left, in seconds.
@@ -98,6 +97,10 @@ public final class CombatTagManager {
         long deltaMs = expiry - System.currentTimeMillis();
         if (deltaMs <= 0) return 0L;
         return (long) Math.ceil(deltaMs/1000.0);
+    }
+
+    public int getDurationSeconds() {
+        return durationSeconds;
     }
 
     // Untag the player.
