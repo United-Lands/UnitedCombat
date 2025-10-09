@@ -96,14 +96,17 @@ public class CombatTagListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void OnQuit(PlayerQuitEvent e) {
         final Player quitter = e.getPlayer();
-
         if (!tags.isTagged(quitter)) return;
-        tags.punishQuitter(quitter);
 
         final Player opponent = tags.getLastOpponent(quitter);
         final boolean opponentOnline = opponent != null && opponent.isOnline();
         final String opponentName = opponent != null ? opponent.getName() : "-";
-        tags.untagSilently(quitter);
+
+        // Punish only if the logout world is not in unpunishable list
+        final boolean punished = tags.shouldPunishOnQuit(quitter);
+        if (punished) {
+            tags.punishQuitter(quitter);
+        }
 
         if (opponent != null) {
             tags.untagSilently(opponent);
@@ -115,15 +118,15 @@ public class CombatTagListener implements Listener {
                     .replacement(quitter.getName())
                     .build();
             opponent.sendMessage(org.unitedlands.combat.util.Utils.getMessage("combat-tagged-opponent-logout").replaceText(rep));
-
-            org.unitedlands.combat.UnitedCombat plugin = org.unitedlands.combat.util.Utils.getUnitedPvP();
-            plugin.getLogger().info(String.format(
-                    "Player %s logged out during combat while fighting %s in world %s.",
-                    quitter.getName(),
-                    opponentName,
-                    quitter.getWorld().getName()
-            ));
         }
+
+        Utils.getUnitedPvP().getLogger().info(String.format(
+                "Player %s logged out while fighting opponent %s in world %s and was %spunished.",
+                quitter.getName(),
+                opponentName,
+                quitter.getWorld().getName(),
+                punished ? "" : "not "
+        ));
 
     }
 

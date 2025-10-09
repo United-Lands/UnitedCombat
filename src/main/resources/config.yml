@@ -35,6 +35,10 @@ combat_tagger:
   blocked-worlds:
     - 'world_arena1'
     - 'world_arena2'
+  # Worlds where combat tagging is enabled but not combat logging punishments.
+  unpunishable-worlds:
+    - 'world_arena3'
+    - 'world_arena4'
   # Players with this permission are not affected by combat tagging.
   bypass-permission: united.combat.bypass
   # What command(s) to run if a player logs out in combat.

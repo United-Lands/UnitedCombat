@@ -27,6 +27,7 @@ public final class CombatTagManager {
     private Set<String> blockedWorlds;
     private String bypassPermission;
     private List<String> punishCommands;
+    private Set<String> unpunishableWorlds;
 
     public CombatTagManager(UnitedCombat plugin) {
         this.plugin = plugin;
@@ -36,23 +37,19 @@ public final class CombatTagManager {
     // Get new values from the config file on plugin reload.
     public void reload() {
         FileConfiguration c = plugin.getConfig();
-
         enabled = c.getBoolean("combat_tagger.enabled", true);
-
         durationSeconds = Math.max(1, c.getInt("combat_tagger.duration"));
-
         blockedCommands = new HashSet<>();
         for (String cmd : c.getStringList("combat_tagger.blocked-commands")) {
             if (cmd != null && !cmd.isEmpty()) {
                 blockedCommands.add(cmd.toLowerCase(Locale.ROOT));
             }
         }
-
         blockedWorlds = new HashSet<>(c.getStringList("combat_tagger.blocked-worlds"));
-
         bypassPermission = c.getString("combat_tagger.bypass-permission");
-
         punishCommands = new ArrayList<>(c.getStringList("combat_tagger.combat-log-commands"));
+        unpunishableWorlds = new HashSet<>(c.getStringList("combat_tagger.unpunishable-worlds"));
+
 
     }
 
@@ -192,6 +189,14 @@ public final class CombatTagManager {
     public Player getLastOpponent(Player p) {
         UUID other = lastOpponent.get(p.getUniqueId());
         return (other == null) ? null : Bukkit.getPlayer(other);
+    }
+
+    // Decide if a world has combat logging punishments.
+    public boolean shouldPunishOnQuit(Player p) {
+        if (!enabled || p == null) return false;
+        if (!isTagged(p)) return false;
+        String world = p.getWorld().getName();
+        return unpunishableWorlds == null || !unpunishableWorlds.contains(world);
     }
 
 }
