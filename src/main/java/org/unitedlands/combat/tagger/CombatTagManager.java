@@ -12,6 +12,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public final class CombatTagManager {
+
+    public JavaPlugin getPlugin() { return plugin; }
+
     private final JavaPlugin plugin;
 
     private final Map<UUID, Long> expiryByPlayer =  new HashMap<>();
@@ -99,7 +102,7 @@ public final class CombatTagManager {
             // Notify player and log
             p.sendMessage(Utils.getMessage("combat-tagged-expired"));
             plugin.getLogger().info(String.format(
-                    "[CombatTag] Tag expired for %s in world %s due to timeout)",
+                    "Combat Tag expired for %s in world %s due to timeout.",
                     p.getName(),
                     p.getWorld().getName()
             ));
@@ -133,7 +136,7 @@ public final class CombatTagManager {
         if (expiryByPlayer.remove(p.getUniqueId()) != null) {
             p.sendMessage(Utils.getMessage("combat-tagged-expired"));
             plugin.getLogger().info(String.format(
-                    "[CombatTag] Tag cleared for %s in world %s due to death)",
+                    "Combat Tag cleared for %s in world %s due to death)",
                     p.getName(),
                     p.getWorld().getName()
             ));
@@ -143,9 +146,9 @@ public final class CombatTagManager {
     }
 
     // Untag players without warning, used for special untag cases.
-    public boolean untagSilently(Player p) {
-        if (p == null) return false;
-        return expiryByPlayer.remove(p.getUniqueId()) != null;
+    public void untagSilently(Player p) {
+        if (p == null) return;
+        expiryByPlayer.remove(p.getUniqueId());
     }
 
     // Check if a player is running a blacklisted command during combat.

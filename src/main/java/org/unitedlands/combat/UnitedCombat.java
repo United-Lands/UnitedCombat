@@ -10,10 +10,7 @@ import org.unitedlands.combat.commands.AdminCmd;
 import org.unitedlands.combat.commands.PvPCmd;
 import org.unitedlands.combat.commands.ReloadCmd;
 import org.unitedlands.combat.hooks.Placeholders;
-import org.unitedlands.combat.listeners.CombatTagListener;
-import org.unitedlands.combat.listeners.ExplosionListener;
-import org.unitedlands.combat.listeners.PlayerListener;
-import org.unitedlands.combat.listeners.TownyListener;
+import org.unitedlands.combat.listeners.*;
 import org.unitedlands.combat.tagger.CombatTagManager;
 import org.unitedlands.combat.tagger.CombatTagBossbar;
 
@@ -33,12 +30,14 @@ public final class UnitedCombat extends JavaPlugin {
 
     private CombatTagManager combatTagManager;
     private CombatTagBossbar combatTagBossbar;
+    private FlightListener flightListener;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         combatTagManager = new CombatTagManager(this);
         combatTagBossbar = new CombatTagBossbar(this, combatTagManager);
+        flightListener = new FlightListener(combatTagManager);
         registerListeners();
 
         ReloadCmd reloadCmd = new ReloadCmd(this);
@@ -58,7 +57,8 @@ public final class UnitedCombat extends JavaPlugin {
         pluginManager.registerEvents(new PlayerListener(this), this);
         pluginManager.registerEvents(new TownyListener(this), this);
         pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
-        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar), this);
+        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar, flightListener), this);
+        pluginManager.registerEvents(flightListener, this);
 
         // PlaceholderAPI Expansion Register
         if (pluginManager.getPlugin("PlaceholderAPI") != null) {
@@ -74,9 +74,10 @@ public final class UnitedCombat extends JavaPlugin {
         pluginManager.registerEvents(new PlayerListener(this), this);
         pluginManager.registerEvents(new TownyListener(this), this);
         pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
-        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar), this);
+        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar, flightListener), this);
         combatTagManager.reload();
         combatTagBossbar.reload();
+        flightListener.reload();
         registerListeners();
         getLogger().info("Plugin configuration reloaded.");
     }

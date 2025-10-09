@@ -41,6 +41,7 @@ combat_tagger:
   combat-log-commands:
     - 'warn %player_name% You have been warned for logging out in combat.'
     - 'kill %player_name%'
+
   # Settings for the bossbar that appears to players who are in combat.
   bossbar:
     # Enable to disable the boss bar function.
@@ -56,6 +57,15 @@ combat_tagger:
     # How long to linger the bar after it's finished (for a smooth transition)
     # Measured in milliseconds, default is 1000
     linger: 1000
+
+  # Flight control settings.
+  flight:
+    # Enable or disable flight during combat.
+    enabled: true
+    # Cancel first fall damage after disabling flight.
+    # Requires flight controls to be TRUE.
+    soft-landing: true
+
 
 ##############################################
 # +----------------------------------------+ #

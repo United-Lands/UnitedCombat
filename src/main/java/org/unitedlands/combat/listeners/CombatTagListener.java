@@ -19,11 +19,13 @@ import java.util.Locale;
 public class CombatTagListener implements Listener {
     private final CombatTagManager tags;
     private final CombatTagBossbar bossbar;
+    private final FlightListener flight;
 
 
-    public CombatTagListener(CombatTagManager tags, CombatTagBossbar combatTagBossbar) {
+    public CombatTagListener(CombatTagManager tags, CombatTagBossbar combatTagBossbar, FlightListener flight) {
         this.tags = tags;
         this.bossbar = combatTagBossbar;
+        this.flight = flight;
     }
 
     // Tag for combat when taking PvP damage, attacker and victim.
@@ -50,11 +52,11 @@ public class CombatTagListener implements Listener {
 
         tags.tag(victim, attacker);
         bossbar.showFor(victim, attacker);
-
+        flight.disableFlight(victim, attacker);
 
         if (!victimWasTagged || !attackerWasTagged) {
             Utils.getUnitedPvP().getLogger().info(String.format(
-                    "[CombatTag] %s tagged %s for combat in world %s.",
+                    "%s tagged %s for combat in world %s.",
                     attacker.getName(),
                     victim.getName(),
                     victim.getWorld().getName()
@@ -80,7 +82,7 @@ public class CombatTagListener implements Listener {
             String root = (space == -1 ? msg : msg.substring(0, space)).toLowerCase(Locale.ROOT);
 
             Utils.getUnitedPvP().getLogger().info(String.format(
-                    "[CombatTag] Player %s tried running forbidden command /%s in world %s during combat.",
+                    "Player %s tried running forbidden command /%s in world %s during combat.",
                     p.getName(),
                     root,
                     p.getWorld().getName()
@@ -116,7 +118,7 @@ public class CombatTagListener implements Listener {
 
             org.unitedlands.combat.UnitedCombat plugin = org.unitedlands.combat.util.Utils.getUnitedPvP();
             plugin.getLogger().info(String.format(
-                    "[CombatTag] Player %s logged out during combat while fighting %s in world %s.",
+                    "Player %s logged out during combat while fighting %s in world %s.",
                     quitter.getName(),
                     opponentName,
                     quitter.getWorld().getName()
