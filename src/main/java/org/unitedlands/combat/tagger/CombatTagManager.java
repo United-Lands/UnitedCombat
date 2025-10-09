@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.unitedlands.combat.UnitedCombat;
+import org.unitedlands.combat.util.Utils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ public final class CombatTagManager {
     private final JavaPlugin plugin;
 
     private final Map<UUID, Long> expiryByPlayer =  new HashMap<>();
+    private final Map<UUID, UUID> lastOpponent = new HashMap<>();
 
     // Load config settings.
     private boolean enabled;
@@ -60,6 +62,9 @@ public final class CombatTagManager {
         final long expiresAt = System.currentTimeMillis()
                 + TimeUnit.SECONDS.toMillis(durationSeconds);
 
+        Player victim = players.length > 0 ? players[0] : null;
+        Player attacker = players.length > 1 ? players[1] : null;
+
         for (Player p : players) {
 
             if (p == null)
@@ -70,6 +75,13 @@ public final class CombatTagManager {
 
             expiryByPlayer.put(p.getUniqueId(), expiresAt);
         }
+
+        // Record attacker and victim relationship.
+        if (victim != null && attacker != null) {
+            lastOpponent.put(victim.getUniqueId(), attacker.getUniqueId());
+            lastOpponent.put(attacker.getUniqueId(), victim.getUniqueId());
+        }
+
     }
 
     // Checks if a player is combat tagged.
@@ -83,6 +95,15 @@ public final class CombatTagManager {
 
         final long now = System.currentTimeMillis();
         if (now >= expiry) {
+
+            // Notify player and log
+            p.sendMessage(Utils.getMessage("combat-tagged-expired"));
+            plugin.getLogger().info(String.format(
+                    "[CombatTag] Tag expired for %s in world %s due to timeout)",
+                    p.getName(),
+                    p.getWorld().getName()
+            ));
+
             expiryByPlayer.remove(id);
             return false;
         }
@@ -108,6 +129,16 @@ public final class CombatTagManager {
     // Untag the player.
     public void untag(Player p) {
         if (p == null) return;
+
+        if (expiryByPlayer.remove(p.getUniqueId()) != null) {
+            p.sendMessage(Utils.getMessage("combat-tagged-expired"));
+            plugin.getLogger().info(String.format(
+                    "[CombatTag] Tag cleared for %s in world %s due to death)",
+                    p.getName(),
+                    p.getWorld().getName()
+            ));
+        }
+
         expiryByPlayer.remove(p.getUniqueId());
     }
 
@@ -147,6 +178,11 @@ public final class CombatTagManager {
     // Check if the player is in an ignored world.
     private boolean isWorldBlocked(Player p) {
         return blockedWorlds != null && blockedWorlds.contains(p.getWorld().getName());
+    }
+
+    public Player getLastOpponent(Player p) {
+        UUID other = lastOpponent.get(p.getUniqueId());
+        return (other == null) ? null : Bukkit.getPlayer(other);
     }
 
 }

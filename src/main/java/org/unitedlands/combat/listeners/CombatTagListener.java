@@ -76,10 +76,33 @@ public class CombatTagListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void OnQuit(PlayerQuitEvent e) {
-        final Player p = e.getPlayer();
-        if (tags.isTagged(p)) {
-            tags.punishQuitter(p);
+        final Player quitter = e.getPlayer();
+
+        if (!tags.isTagged(quitter)) return;
+
+        tags.punishQuitter(quitter);
+
+        final Player opponent = tags.getLastOpponent(quitter);
+        tags.untag(quitter);
+
+        if (opponent != null) {
+            tags.untag(opponent);
         }
+
+        var rep = net.kyori.adventure.text.TextReplacementConfig.builder()
+                .match("{0}")
+                .replacement(quitter.getName())
+                .build();
+        opponent.sendMessage(org.unitedlands.combat.util.Utils.getMessage("combat-tagged-opponent-logout").replaceText(rep));
+
+        org.unitedlands.combat.UnitedCombat plugin = org.unitedlands.combat.util.Utils.getUnitedPvP();
+        plugin.getLogger().info(String.format(
+                "[CombatTag] Player %s logged out during combat while fighting %s in world %s.",
+                quitter.getName(),
+                opponent.getName(),
+                quitter.getWorld().getName()
+        ));
+
     }
 
     // Clear combat tags for players if one dies.

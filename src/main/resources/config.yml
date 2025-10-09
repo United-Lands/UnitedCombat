@@ -192,4 +192,7 @@ messages:
 # +---------------------------------------------+ #
 
   combat-tagged: '§cYou are now in combat! Do not log out.'
+  combat-tagged-expired: '§aYou are no longer in combat.'
   combat-tagged-blocked-command: '§cYou cannot use that command in combat.'
+  # {0} is the opponent's username.
+  combat-tagged-opponent-logout: '§e§l{0} §alogged out, you are no longer in combat.'
