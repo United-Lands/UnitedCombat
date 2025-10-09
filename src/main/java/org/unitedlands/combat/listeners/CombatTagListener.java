@@ -14,6 +14,8 @@ import org.unitedlands.combat.tagger.CombatTagBossbar;
 import org.unitedlands.combat.tagger.CombatTagManager;
 import org.unitedlands.combat.util.Utils;
 
+import java.util.Locale;
+
 public class CombatTagListener implements Listener {
     private final CombatTagManager tags;
     private final CombatTagBossbar bossbar;
@@ -49,13 +51,15 @@ public class CombatTagListener implements Listener {
         tags.tag(victim, attacker);
         bossbar.showFor(victim, attacker);
 
-        Utils.getUnitedPvP().getLogger().info(
-                String.format(" %s tagged %s for combat in world %s)",
-                        attacker.getName(),
-                        victim.getName(),
-                        victim.getWorld().getName()
-                )
-        );
+
+        if (!victimWasTagged || !attackerWasTagged) {
+            Utils.getUnitedPvP().getLogger().info(String.format(
+                    "[CombatTag] %s tagged %s for combat in world %s.",
+                    attacker.getName(),
+                    victim.getName(),
+                    victim.getWorld().getName()
+            ));
+        }
 
         if (!victimWasTagged && tags.isTagged(victim)) {
             victim.sendMessage(Utils.getMessage("combat-tagged"));
@@ -69,6 +73,19 @@ public class CombatTagListener implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent e) {
         final Player p = e.getPlayer();
         if (tags.shouldBlockCommand(p, e.getMessage())) {
+
+            // Find out the command for the logs.
+            String msg = e.getMessage().startsWith("/") ? e.getMessage().substring(1) : e.getMessage();
+            int space = msg.indexOf(' ');
+            String root = (space == -1 ? msg : msg.substring(0, space)).toLowerCase(Locale.ROOT);
+
+            Utils.getUnitedPvP().getLogger().info(String.format(
+                    "[CombatTag] Player %s tried running forbidden command /%s in world %s during combat.",
+                    p.getName(),
+                    root,
+                    p.getWorld().getName()
+            ));
+
             e.setCancelled(true);
             p.sendMessage(Utils.getMessage("combat-tagged-blocked-command"));
         }
@@ -79,29 +96,32 @@ public class CombatTagListener implements Listener {
         final Player quitter = e.getPlayer();
 
         if (!tags.isTagged(quitter)) return;
-
         tags.punishQuitter(quitter);
 
         final Player opponent = tags.getLastOpponent(quitter);
-        tags.untag(quitter);
+        final boolean opponentOnline = opponent != null && opponent.isOnline();
+        final String opponentName = opponent != null ? opponent.getName() : "-";
+        tags.untagSilently(quitter);
 
         if (opponent != null) {
-            tags.untag(opponent);
+            tags.untagSilently(opponent);
         }
 
-        var rep = net.kyori.adventure.text.TextReplacementConfig.builder()
-                .match("{0}")
-                .replacement(quitter.getName())
-                .build();
-        opponent.sendMessage(org.unitedlands.combat.util.Utils.getMessage("combat-tagged-opponent-logout").replaceText(rep));
+        if (opponentOnline) {
+            var rep = net.kyori.adventure.text.TextReplacementConfig.builder()
+                    .matchLiteral("{0}")
+                    .replacement(quitter.getName())
+                    .build();
+            opponent.sendMessage(org.unitedlands.combat.util.Utils.getMessage("combat-tagged-opponent-logout").replaceText(rep));
 
-        org.unitedlands.combat.UnitedCombat plugin = org.unitedlands.combat.util.Utils.getUnitedPvP();
-        plugin.getLogger().info(String.format(
-                "[CombatTag] Player %s logged out during combat while fighting %s in world %s.",
-                quitter.getName(),
-                opponent.getName(),
-                quitter.getWorld().getName()
-        ));
+            org.unitedlands.combat.UnitedCombat plugin = org.unitedlands.combat.util.Utils.getUnitedPvP();
+            plugin.getLogger().info(String.format(
+                    "[CombatTag] Player %s logged out during combat while fighting %s in world %s.",
+                    quitter.getName(),
+                    opponentName,
+                    quitter.getWorld().getName()
+            ));
+        }
 
     }
 

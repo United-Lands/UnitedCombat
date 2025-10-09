@@ -142,6 +142,12 @@ public final class CombatTagManager {
         expiryByPlayer.remove(p.getUniqueId());
     }
 
+    // Untag players without warning, used for special untag cases.
+    public boolean untagSilently(Player p) {
+        if (p == null) return false;
+        return expiryByPlayer.remove(p.getUniqueId()) != null;
+    }
+
     // Check if a player is running a blacklisted command during combat.
     public boolean shouldBlockCommand(Player p, String rawMessage) {
         if (!enabled || p == null || rawMessage == null) return false;
