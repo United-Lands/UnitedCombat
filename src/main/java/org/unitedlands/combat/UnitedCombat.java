@@ -69,15 +69,9 @@ public final class UnitedCombat extends JavaPlugin {
     public void reloadPluginConfig() {
         // Reapply config on reload.
         reloadConfig();
-        unregisterListeners();
-        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
-        pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new TownyListener(this), this);
-        pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
-        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar, flightListener), this);
         combatTagManager.reload();
         combatTagBossbar.reload();
-        flightListener.reload();
+        unregisterListeners();
         registerListeners();
         getLogger().info("Plugin configuration reloaded.");
     }

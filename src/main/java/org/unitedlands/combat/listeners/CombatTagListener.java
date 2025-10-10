@@ -21,7 +21,6 @@ public class CombatTagListener implements Listener {
     private final CombatTagBossbar bossbar;
     private final FlightListener flight;
 
-
     public CombatTagListener(CombatTagManager tags, CombatTagBossbar combatTagBossbar, FlightListener flight) {
         this.tags = tags;
         this.bossbar = combatTagBossbar;

@@ -26,8 +26,9 @@ public final class CombatTagManager {
     private Set<String> blockedCommands;
     private Set<String> blockedWorlds;
     private String bypassPermission;
-    private List<String> punishCommands;
     private Set<String> unpunishableWorlds;
+    private boolean punishmentEscalation;
+    private List<List<String>> punishmentSteps;
 
     public CombatTagManager(UnitedCombat plugin) {
         this.plugin = plugin;
@@ -47,10 +48,28 @@ public final class CombatTagManager {
         }
         blockedWorlds = new HashSet<>(c.getStringList("combat_tagger.blocked-worlds"));
         bypassPermission = c.getString("combat_tagger.bypass-permission");
-        punishCommands = new ArrayList<>(c.getStringList("combat_tagger.combat-log-commands"));
         unpunishableWorlds = new HashSet<>(c.getStringList("combat_tagger.unpunishable-worlds"));
+        punishmentEscalation = c.getBoolean("combat_tagger.combat-log-punishments.punishment-escalation");
+        punishmentSteps = new ArrayList<>();
 
+        org.bukkit.configuration.ConfigurationSection base =
+                c.getConfigurationSection("combat_tagger.combat-log-punishments");
+        if (base != null) {
+            for (String key : base.getKeys(false)) {
+                if ("punishment-escalation".equalsIgnoreCase(key)) continue;
+                // Only accept numbers.
+                try {
+                    Integer.parseInt(key);
+                    List<String> cmds = c.getStringList("combat_tagger.combat-log-punishments." + key);
+                    if (!cmds.isEmpty()) {
+                        punishmentSteps.add(new ArrayList<>(cmds));
+                    }
+                } catch (NumberFormatException ignore) {
 
+                }
+            }
+            punishmentSteps.sort(Comparator.comparingInt(listKey -> 0));
+        }
     }
 
     // Tag a player.
@@ -164,13 +183,37 @@ public final class CombatTagManager {
     // Run the config defined commands to anyone that logs out during combat.
     public void punishQuitter(Player p) {
         if (!enabled || p == null) return;
-        if (punishCommands == null || punishCommands.isEmpty()) return;
+        if (punishmentSteps == null || punishmentSteps.isEmpty()) return;
 
+        // Skip punishments in disabled worlds and don't increment counter.
+        if (!shouldPunishOnQuit(p)) {
+            return;
+        }
+
+        // Read current offence count from the player file
+        org.unitedlands.combat.player.PvpPlayer pp = new org.unitedlands.combat.player.PvpPlayer(p);
+        int current = pp.getCombatLogPunishmentCount();
+
+        // Decide which step to run.
+        int maxIndex = punishmentSteps.size() - 1;
+        int stepIndex;
+        if (punishmentEscalation) {
+            stepIndex = Math.min(current, maxIndex);
+        } else {
+            stepIndex = 0;
+        }
+
+        // Execute commands for the chosen step.
         final String name = p.getName();
-        for (String template : punishCommands) {
+        for (String template : punishmentSteps.get(stepIndex)) {
             if (template == null || template.isEmpty()) continue;
             String cmd = template.replace("%player_name%", name);
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+        }
+
+        // Only increment if escalation is enabled AND they haven't exceeded the last step.
+        if (punishmentEscalation && current < (maxIndex + 1)) {
+            pp.setCombatLogPunishmentCount(current + 1);
         }
     }
 

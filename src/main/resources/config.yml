@@ -70,6 +70,23 @@ combat_tagger:
     # Requires flight controls to be TRUE.
     soft-landing: true
 
+  # What command(s) to run if a player logs out in combat.
+  combat-log-punishments:
+    # Enable or disable escalating punishments.
+    # When TRUE, combat logging is recorded and each successive time can run different commands for harsher punishments.
+    # When FALSE, only the first configured list of punishments are ever applied.
+    punishment-escalation: true
+    1:
+      - 'warn %player_name% Combat logging, 1st offence.'
+    2:
+      - 'warn %player_name% Combat logging, 2nd offence.'
+      - 'kill %player_name%'
+    3:
+      - 'tempban %player_name% 3d Combat logging, 3rd offence.'
+      - 'kill %player_name%'
+    4:
+      - 'ban %player_name% Combat logging, 4th offence.'
+      - 'kill %player_name'
 
 ##############################################
 # +----------------------------------------+ #

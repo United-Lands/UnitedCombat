@@ -12,6 +12,7 @@ import org.unitedlands.combat.UnitedCombat;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class PvpPlayer {
     private final UnitedCombat unitedCombat = getPlugin();
@@ -37,14 +38,32 @@ public class PvpPlayer {
 
     public void createFile() {
         File playerDataFile = getPlayerFile();
+        File parent = playerDataFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+            boolean ok = parent.mkdirs();
+            if (!ok && !parent.exists()) {
+                unitedCombat.getLogger().log(Level.SEVERE,
+                        "Failed to create parent directory for " + playerDataFile.getAbsolutePath());
+                throw new IllegalStateException("Cannot create player data directory: " + parent.getAbsolutePath());
+            }
+        }
+
+        // Create the file if missing (usually for new players) and report failures.
         if (!playerDataFile.exists()) {
-            playerDataFile.getParentFile().mkdirs();
             try {
-                playerDataFile.createNewFile();
+                boolean created = playerDataFile.createNewFile();
+                if (!created && !playerDataFile.exists()) {
+                    unitedCombat.getLogger().log(Level.SEVERE,
+                            "Failed to create data file: " + playerDataFile.getAbsolutePath());
+                    throw new IllegalStateException("Cannot create player data file: " + playerDataFile.getAbsolutePath());
+                }
             } catch (IOException e) {
+                unitedCombat.getLogger().log(Level.SEVERE,
+                        "IOException while creating player data file: " + playerDataFile.getAbsolutePath(), e);
                 throw new RuntimeException(e);
             }
         }
+
         FileConfiguration fileConfiguration = new YamlConfiguration();
         try {
             fileConfiguration.load(playerDataFile);
@@ -54,9 +73,12 @@ public class PvpPlayer {
             fileConfiguration.set("last-hostility-change-time", System.currentTimeMillis());
             fileConfiguration.set("can-degrade", true);
             fileConfiguration.set("immunity-time", System.currentTimeMillis());
+            fileConfiguration.set("combat-log-punishments", 0);
             saveConfig(fileConfiguration);
         } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
+            unitedCombat.getLogger().log(Level.SEVERE,
+                    "Failed to initialise player data file: " + playerDataFile.getAbsolutePath(), e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -68,7 +90,9 @@ public class PvpPlayer {
         try {
             fileConfig.save(getPlayerFile());
         } catch (IOException e) {
-            e.printStackTrace();
+            unitedCombat.getLogger().log(Level.SEVERE,
+                    "Failed to save player data file: " + getPlayerFile().getAbsolutePath(), e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -77,11 +101,21 @@ public class PvpPlayer {
         FileConfiguration fileConfiguration = new YamlConfiguration();
         try {
             fileConfiguration.load(playerStatsFile);
+            return fileConfiguration;
         } catch (IOException | InvalidConfigurationException e) {
+            // Log the failure, try to recreate a fresh file, then load again once.
+            unitedCombat.getLogger().log(Level.WARNING,
+                    "Failed to load player data file, attempting to recreate: " + playerStatsFile.getAbsolutePath(), e);
             createFile();
-            return getFileConfiguration();
+            try {
+                fileConfiguration.load(playerStatsFile);
+                return fileConfiguration;
+            } catch (IOException | InvalidConfigurationException e2) {
+                unitedCombat.getLogger().log(Level.SEVERE,
+                        "Failed to reload player data file after recreation: " + playerStatsFile.getAbsolutePath(), e2);
+                throw new RuntimeException(e2);
+            }
         }
-        return fileConfiguration;
     }
 
     public void updatePlayerHostility() {
@@ -199,4 +233,14 @@ public class PvpPlayer {
     public long getLastHostilityChangeTime() {
         return playerConfig.getLong("last-hostility-change-time");
     }
+
+    public int getCombatLogPunishmentCount() {
+        return playerConfig.getInt("combat-log-punishments", 0);
+    }
+
+    public void setCombatLogPunishmentCount(int value) {
+        playerConfig.set("combat-log-punishments", Math.max(0, value));
+        saveConfig(playerConfig);
+    }
+
 }
