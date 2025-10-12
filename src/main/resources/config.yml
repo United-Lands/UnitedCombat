@@ -1,5 +1,91 @@
 ##############################################
 # +----------------------------------------+ #
+# |             Combat Tagging             | #
+# +----------------------------------------+ #
+##############################################
+
+# Settings related to the combat tagger mechanics.
+
+combat_tagger:
+  # Enable or disable the feature.
+  enabled: true
+  # Duration of a combat tag, in seconds.
+  # Cannot be lower than 1.
+  duration: 30
+  # List of blocked commands to not allow during combat.
+  blocked-commands:
+    - 'tp'
+    - 'tpa'
+    - 'tpahere'
+    - 'tpaccept'
+    - 'tpadeny'
+    - 'fly'
+    - 'spawn'
+    - 'rtp'
+    - 'warp'
+    - 'home'
+    - 'sethome'
+    - 'suicide'
+    - 'trade'
+    - 'ender'
+    - 'enderchest'
+    - 'ec'
+    - 'warp'
+  # Worlds in this list are not affected by combat tagging.
+  blocked-worlds:
+    - 'world_arena1'
+    - 'world_arena2'
+  # Worlds where combat tagging is enabled but not combat logging punishments.
+  unpunishable-worlds:
+    - 'world_arena3'
+    - 'world_arena4'
+  # Players with this permission are not affected by combat tagging.
+  bypass-permission: united.combat.bypass
+
+  # Settings for the bossbar that appears to players who are in combat.
+  bossbar:
+    # Enable to disable the boss bar function.
+    enabled: true
+    # Text displayed within the bossbar.
+    title: "§cIn Combat (§e§l%seconds%s§c)"
+    # Bossbar colour, only supports:
+    # PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
+    colour: "RED"
+    # Boss bar styling, only supports:
+    # SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+    style: "SOLID"
+    # How long to linger the bar after it's finished (for a smooth transition)
+    # Measured in milliseconds, default is 1000
+    linger: 1000
+
+  # Flight control settings.
+  flight:
+    # Enable or disable flight during combat.
+    enabled: true
+    # Cancel first fall damage after disabling flight.
+    # Requires flight controls to be TRUE.
+    soft-landing: true
+
+  # What command(s) to run if a player logs out in combat.
+  combat-log-punishments:
+    # Enable or disable escalating punishments.
+    # When TRUE, combat logging is recorded and each successive time can run different commands for harsher punishments.
+    # When FALSE, only the first configured list of punishments are ever applied.
+    punishment-escalation: true
+    1:
+      - 'warn %player_name% Combat logging, 1st offence.'
+    2:
+      - 'warn %player_name% Combat logging, 2nd offence.'
+      - 'kill %player_name%'
+    3:
+      - 'tempban %player_name% 3d Combat logging, 3rd offence.'
+      - 'kill %player_name%'
+    4:
+      - 'ban %player_name% Combat logging, 4th offence.'
+      - 'kill %player_name'
+
+##############################################
+# +----------------------------------------+ #
 # |               Explosions               | #
 # +----------------------------------------+ #
 ##############################################
@@ -127,3 +213,13 @@ messages:
     - '§8/ca [player] degrade [on/off] §7Toggles the player''s hostility decrease every new Towny day.'
     - '§8/ca [player] sethostility [1-21] §7Sets the player''s hostility level.'
     - '§8/ca [player] forcepvp §7Force-disables pvp immunity for new players.'
+
+# +---------------------------------------------+ #
+# |              Combat Tagging                 | #
+# +---------------------------------------------+ #
+
+  combat-tagged: '§cYou are now in combat! Do not log out.'
+  combat-tagged-expired: '§aYou are no longer in combat.'
+  combat-tagged-blocked-command: '§cYou cannot use that command in combat.'
+  # {0} is the opponent's username.
+  combat-tagged-opponent-logout: '§e§l{0} §alogged out, you are no longer in combat.'
