@@ -41,10 +41,6 @@ combat_tagger:
     - 'world_arena4'
   # Players with this permission are not affected by combat tagging.
   bypass-permission: united.combat.bypass
-  # What command(s) to run if a player logs out in combat.
-  combat-log-commands:
-    - 'warn %player_name% You have been warned for logging out in combat.'
-    - 'kill %player_name%'
 
   # Settings for the bossbar that appears to players who are in combat.
   bossbar:
