@@ -114,6 +114,16 @@ minecarts:
 # +----------------------------------------+ #
 ##############################################
 
+hostility-icons:
+  defensive: '🛡'
+  aggressive: '⚔'
+  hostile: '☠'
+
+hostility-thresholds:
+  defensive: 1
+  aggressive: 7
+  hostile: 15
+
 hostility-exempt-worlds:
   - 'world_arena1'
   - 'world_arena2'

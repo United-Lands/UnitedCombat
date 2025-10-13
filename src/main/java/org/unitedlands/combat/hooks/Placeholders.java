@@ -34,14 +34,13 @@ public class Placeholders extends PlaceholderExpansion {
             PvpPlayer pvpPlayer = new PvpPlayer((Player) player);
             if (params.equalsIgnoreCase("status")) {
                 int hostility = pvpPlayer.getHostility();
-                return pvpPlayer.getIconHex(hostility) + pvpPlayer.getStatus().getIcon();
+                return pvpPlayer.getIconHex(hostility) + pvpPlayer.getStatusIcon();
             } else if (params.equalsIgnoreCase("status-string")) {
-                return String.valueOf(pvpPlayer.getStatus());
+                pvpPlayer.getStatusKey();
             } else if (params.equalsIgnoreCase("is-immune")) {
                 return String.valueOf(pvpPlayer.isImmune());
             }
         }
-
         return null;
     }
 }

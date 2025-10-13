@@ -11,6 +11,7 @@ import org.unitedlands.combat.UnitedCombat;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -34,6 +35,33 @@ public class PvpPlayer {
 
     public OfflinePlayer getPlayer() {
         return player;
+    }
+
+    private Map<String, Integer> getThresholds() {
+        FileConfiguration cfg = unitedCombat.getConfig();
+        Map<String, Integer> map = new LinkedHashMap<>();
+        if (cfg.isConfigurationSection("hostility-thresholds")) {
+            for (String key : Objects.requireNonNull(cfg.getConfigurationSection("hostility-thresholds")).getKeys(false)) {
+                int start = Math.max(1, cfg.getInt("hostility-thresholds." + key));
+                map.put(key.toLowerCase(Locale.ROOT), start);
+            }
+        }
+        return map;
+    }
+
+    private String getFirstStatusKey() {
+        return getThresholds().entrySet().stream()
+                .min(Comparator.comparingInt(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .orElse("defensive");
+    }
+
+    private String resolveStatusKeyForHostility(int hostility) {
+        return getThresholds().entrySet().stream()
+                .filter(e -> hostility >= e.getValue())
+                .max(Comparator.comparingInt(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .orElse(getFirstStatusKey());
     }
 
     public void createFile() {
@@ -69,7 +97,7 @@ public class PvpPlayer {
             fileConfiguration.load(playerDataFile);
             fileConfiguration.set("name", player.getName());
             fileConfiguration.set("hostility", 1);
-            fileConfiguration.set("status", Status.DEFENSIVE.toString());
+            fileConfiguration.set("status", getFirstStatusKey());
             fileConfiguration.set("last-hostility-change-time", System.currentTimeMillis());
             fileConfiguration.set("can-degrade", true);
             fileConfiguration.set("immunity-time", System.currentTimeMillis());
@@ -120,14 +148,14 @@ public class PvpPlayer {
 
     public void updatePlayerHostility() {
         if (isHostile()) {
-            setStatus(getStatus());
+            setStatusKey(getStatusKey()); // touch + sync
             updateLastHostilityChangeTime();
             return;
         }
         if (isDegradable()) {
             if (isAggressive()) {
                 setHostility(getHostility() - 1);
-                setStatus(getStatus());
+                setStatusKey(getStatusKey());
                 return;
             }
             if (isDefensive()) {
@@ -135,7 +163,7 @@ public class PvpPlayer {
                     return;
                 }
                 setHostility(getHostility() - 1);
-                setStatus(getStatus());
+                setStatusKey(getStatusKey());
             }
         }
     }
@@ -156,33 +184,33 @@ public class PvpPlayer {
         saveConfig(playerConfig);
     }
 
-    public void setStatus(Status status) {
-        playerConfig.set("status", status.toString());
+    public void setStatusKey(String statusKey) {
+        playerConfig.set("status", statusKey.toLowerCase(Locale.ROOT));
         saveConfig(playerConfig);
     }
-    public boolean isDefensive() {
-        return getStatus().equals(Status.DEFENSIVE);
-    }
-    public boolean isHostile() {
-        return getStatus().equals(Status.HOSTILE);
-    }
-    public boolean isAggressive() {
-        return getStatus().equals(Status.AGGRESSIVE);
-    }
-    public Status getStatus() {
-        int hostility = getHostility();
-        if (hostility >= Status.HOSTILE.getStartingValue()) {
-            return Status.HOSTILE;
-        } else if (hostility >= Status.AGGRESSIVE.getStartingValue()) {
-            return Status.AGGRESSIVE;
-        } else {
-            return Status.DEFENSIVE;
+
+    public String getStatusKey() {
+        String computed = resolveStatusKeyForHostility(getHostility());
+        if (!computed.equalsIgnoreCase(playerConfig.getString("status"))) {
+            setStatusKey(computed);
         }
+        return computed;
     }
+
+    public boolean isDefensive() { return getStatusKey().equals("defensive"); }
+    public boolean isHostile()   { return getStatusKey().equals("hostile"); }
+    public boolean isAggressive(){ return getStatusKey().equals("aggressive"); }
 
     public String getIconHex(int hostility) {
         FileConfiguration config = unitedCombat.getConfig();
         return config.getString("hostility-colour-stages." + hostility);
+    }
+
+    public String getStatusIcon() {
+        FileConfiguration cfg = unitedCombat.getConfig();
+        String key = getStatusKey();
+        String icon = cfg.getString("hostility-icons." + key);
+        return (icon != null) ? icon : "";
     }
 
     public boolean isDegradable() {

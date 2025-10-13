@@ -117,7 +117,7 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
 
     private void returnPvPStatus(Player sender, OfflinePlayer player) {
         PvpPlayer pvpPlayer = new PvpPlayer(player);
-        String status = pvpPlayer.getStatus().name().toLowerCase();
+        String status = pvpPlayer.getStatusKey();
 
         TextReplacementConfig nameReplacer = TextReplacementConfig.builder()
                 .match("<name>")
