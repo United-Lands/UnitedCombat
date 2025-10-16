@@ -13,6 +13,7 @@ combat_tagger:
   # Cannot be lower than 1.
   duration: 30
   # List of blocked commands to not allow during combat.
+  # NOTE: Any command containing the word 'warp' anywhere is hard-coded to be blocked.
   blocked-commands:
     - 'tp'
     - 'tpa'
@@ -31,6 +32,8 @@ combat_tagger:
     - 'enderchest'
     - 'ec'
     - 'warp'
+  # Backup setting to block command and plugin initiated teleports if command blacklisting isn't enough.
+  disable-warping: true
   # Worlds in this list are not affected by combat tagging.
   blocked-worlds:
     - 'world_arena1'

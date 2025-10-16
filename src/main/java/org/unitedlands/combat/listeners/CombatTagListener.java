@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.unitedlands.combat.tagger.CombatTagBossbar;
 import org.unitedlands.combat.tagger.CombatTagManager;
 import org.unitedlands.combat.util.Utils;
@@ -143,4 +144,30 @@ public class CombatTagListener implements Listener {
             tags.untag(killer);
         }
     }
+
+    // Fallback protections to block warping away during combat.
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+
+        if (!Utils.getUnitedPvP().getConfig().getBoolean("combat_tagger.disable-warping"))
+            return;
+
+        if (!tags.isTagged(player))
+            return;
+
+        // Only block command or plugin-based teleports.
+        PlayerTeleportEvent.TeleportCause cause = event.getCause();
+        switch (cause) {
+            case COMMAND:
+            case PLUGIN:
+                event.setCancelled(true);
+                player.sendMessage(Utils.getMessage("combat-tagged-blocked-command"));
+                break;
+            default:
+                // Allow other teleport types like ender pearls, portals, death, etc.
+                break;
+        }
+    }
+
 }

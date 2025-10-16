@@ -152,7 +152,7 @@ public final class CombatTagManager {
         if (expiryByPlayer.remove(p.getUniqueId()) != null) {
             p.sendMessage(Utils.getMessage("combat-tagged-expired"));
             plugin.getLogger().info(String.format(
-                    "Combat Tag cleared for %s in world %s due to death)",
+                    "Combat Tag cleared for %s in world %s due to death",
                     p.getName(),
                     p.getWorld().getName()
             ));
