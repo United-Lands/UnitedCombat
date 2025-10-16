@@ -63,8 +63,10 @@ combat_tagger:
 
   # Flight control settings.
   flight:
-    # Enable or disable flight during combat.
-    enabled: true
+    # Enable or disable plugin or command flight during combat.
+    plugin-flight: true
+    # Enable or disable elytra flight during combat.
+    elytra-flight: true
     # Cancel first fall damage after disabling flight.
     # Requires flight controls to be TRUE.
     soft-landing: true
