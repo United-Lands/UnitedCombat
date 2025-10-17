@@ -1,5 +1,6 @@
 package org.unitedlands.combat.listeners;
 
+import dev.geco.gsit.api.event.PrePlayerPlayerSitEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -167,6 +168,18 @@ public class CombatTagListener implements Listener {
             default:
                 // Allow other teleport types like ender pearls, portals, death, etc.
                 break;
+        }
+    }
+
+    // Blocks sitting on other players during combat.
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPrePlayerPlayerSit(PrePlayerPlayerSitEvent event) {
+        if (!Utils.getUnitedPvP().getConfig().getBoolean("combat_tagger.disable-sitting")) {
+            return;
+        }
+        Player p = event.getPlayer();
+        if (tags.isTagged(p)) {
+            event.setCancelled(true);
         }
     }
 

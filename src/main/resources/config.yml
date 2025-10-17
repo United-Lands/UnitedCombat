@@ -34,6 +34,9 @@ combat_tagger:
     - 'warp'
   # Backup setting to block command and plugin initiated teleports if command blacklisting isn't enough.
   disable-warping: true
+  # Disable sitting on other players during combat.
+  # Only works with the GSit plugin by Gecolay.
+  disable-sitting: true
   # Worlds in this list are not affected by combat tagging.
   blocked-worlds:
     - 'world_arena1'
