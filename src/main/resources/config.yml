@@ -69,6 +69,7 @@ combat_tagger:
     # Enable or disable plugin or command flight during combat.
     plugin-flight: true
     # Enable or disable elytra flight during combat.
+    # This also cancels the use of trident riptides.
     elytra-flight: true
     # Cancel first fall damage after disabling flight.
     # Requires flight controls to be TRUE.

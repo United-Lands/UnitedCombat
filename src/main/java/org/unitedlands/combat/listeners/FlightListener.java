@@ -1,5 +1,6 @@
 package org.unitedlands.combat.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -7,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.unitedlands.combat.tagger.CombatTagManager;
 
@@ -79,6 +81,24 @@ public class FlightListener implements Listener {
         if (e.isGliding() && tags.isTagged(p)) {
             e.setCancelled(true);
         }
+    }
+
+    // Block the player activating their elytra through the riptide enchantment of a trident.
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onRiptide(PlayerRiptideEvent e) {
+        if (!elytraFlightEnabled) return;
+        Player p = e.getPlayer();
+        if (!tags.isTagged(p)) return;
+
+        // Reset their velocity to cancel any movement.
+        Bukkit.getScheduler().runTask(tags.getPlugin(), () -> {
+            p.setVelocity(p.getVelocity().zero());
+            // Extra guard against elytra opening.
+            if (p.isGliding()) p.setGliding(false);
+            if (softLandingEnabled) {
+                softLanding.add(p.getUniqueId());
+            }
+        });
     }
 
     // Cancel any initial damage from falling.
