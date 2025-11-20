@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.unitedlands.combat.commands.AdminCmd;
@@ -11,7 +13,9 @@ import org.unitedlands.combat.commands.PvPCmd;
 import org.unitedlands.combat.commands.ReloadCmd;
 import org.unitedlands.combat.hooks.Placeholders;
 import org.unitedlands.combat.listeners.*;
+import org.unitedlands.combat.listeners.interfaces.IGraveListener;
 import org.unitedlands.combat.tagger.CombatTagManager;
+import org.unitedlands.utils.Logger;
 import org.unitedlands.combat.tagger.CombatTagBossbar;
 
 import java.util.Objects;
@@ -59,6 +63,24 @@ public final class UnitedCombat extends JavaPlugin {
         pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
         pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar, flightListener), this);
         pluginManager.registerEvents(flightListener, this);
+
+        IGraveListener gravesListener = null;
+        Plugin angelChest = Bukkit.getPluginManager().getPlugin("AngelChest");
+        if (angelChest != null && angelChest.isEnabled()) {
+            Logger.log("[UnitedCombat] AngelChest found, enabling integration.");
+            gravesListener = new AngelChestGraveListener();
+        }
+        Plugin axGraves = Bukkit.getPluginManager().getPlugin("AxGraves");
+        if (axGraves != null && axGraves.isEnabled()) {
+            Logger.log("[UnitedCombat] AxGraves found, enabling integration.");
+            gravesListener = new AxGravesListener();
+        }
+
+        if (gravesListener != null)
+        {
+            pluginManager.registerEvents((Listener)gravesListener, this);
+        }
+
 
         // PlaceholderAPI Expansion Register
         if (pluginManager.getPlugin("PlaceholderAPI") != null) {
