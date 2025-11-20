@@ -192,30 +192,6 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onGraveSpawn(AngelChestSpawnEvent event) {
-        AngelChest chest = event.getAngelChest();
-        Location graveLocation = chest.getBlock().getLocation();
-        OfflinePlayer player = chest.getPlayer();
-        if (isInOutlawTown(player, graveLocation))
-            chest.setProtected(false);
-    }
-
-    private boolean isInOutlawTown(OfflinePlayer player, Location graveLocation) {
-        Resident resident = towny.getResident(player.getUniqueId());
-        if (resident == null)
-            return false;
-        // Make sure they're not in the wilderness
-        if (towny.isWilderness(graveLocation))
-            return false;
-        Town town = towny.getTownBlock(graveLocation).getTownOrNull();
-        // This shouldn't happen but adding it to be safe.
-        if (town == null)
-            return false;
-
-        return town.hasOutlaw(resident);
-    }
-
-    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
             return;
