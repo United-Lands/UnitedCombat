@@ -117,6 +117,12 @@ minecarts:
   # The damage the minecart will do, in %. 0 will do no damage, 50 will do half damage, and 100 will do full damage.
   minecart-damage-percent: 0
 
+mace:
+  # Toggle on or off damage cap for maces.
+  nerf-mace-damage: true
+  # The max amount of mace damage applied to players in pvp
+  mace_max_damage: 75
+
 ##############################################
 # +----------------------------------------+ #
 # |                Hostility               | #
