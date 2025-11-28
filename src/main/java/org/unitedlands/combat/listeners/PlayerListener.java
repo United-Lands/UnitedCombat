@@ -6,8 +6,7 @@ import com.palmergames.bukkit.towny.event.player.PlayerKilledPlayerEvent;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
-import de.jeff_media.angelchest.AngelChest;
-import de.jeff_media.angelchest.events.AngelChestSpawnEvent;
+
 import net.kyori.adventure.text.TextReplacementConfig;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.*;
@@ -115,6 +114,7 @@ public class PlayerListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
 
         if (Utils.isPvP(event)) {
+
             Player target = (Player) event.getEntity();
             Player damager = getAttacker(event.getDamager());
 
@@ -134,6 +134,14 @@ public class PlayerListener implements Listener {
                                 .formatDuration(TimeUnit.DAYS.toMillis(1) - pvpDamager.getImmunityTime(), "HH:mm:ss"))
                         .build();
                 damager.sendMessage(Utils.getMessage("you-are-immune").replaceText(timeReplacer));
+            }
+
+            if (damager.getInventory().getItemInMainHand().getType() == Material.MACE) {
+                if (unitedCombat.getConfig().getBoolean("mace.nerf-mace-damage")) {
+                    var max = unitedCombat.getConfig().getDouble("mace.mace_max_damage", Double.MAX_VALUE);
+                    if (event.getFinalDamage() > max)
+                        event.setDamage(max);
+                }
             }
         }
     }
@@ -226,21 +234,26 @@ public class PlayerListener implements Listener {
 
         // Was the last damage caused by an entity?
         var last = victim.getLastDamageCause();
-        if (!(last instanceof EntityDamageByEntityEvent edbe)) return;
+        if (!(last instanceof EntityDamageByEntityEvent edbe))
+            return;
 
         // Was that entity an ender crystal?
-        if (!(edbe.getDamager() instanceof EnderCrystal crystal)) return;
+        if (!(edbe.getDamager() instanceof EnderCrystal crystal))
+            return;
 
         // Exempt defined worlds
         var exempt = unitedCombat.getConfig().getStringList("hostility-exempt-worlds");
-        if (exempt.contains(victim.getWorld().getName())) return;
+        if (exempt.contains(victim.getWorld().getName()))
+            return;
 
         // Is the crystal registered to a placer?
         UUID placerId = crystalMap.get(crystal);
-        if (placerId == null) return;
+        if (placerId == null)
+            return;
 
         Player placer = Bukkit.getPlayer(placerId);
-        if (placer == null || placer.equals(victim)) return; // ignore suicide or offline placer.
+        if (placer == null || placer.equals(victim))
+            return; // ignore suicide or offline placer.
 
         // Increase hostility.
         PvpPlayer pvpPlacer = new PvpPlayer(placer);
