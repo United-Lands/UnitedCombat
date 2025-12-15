@@ -1,6 +1,5 @@
 package org.unitedlands.combat.commands;
 
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
@@ -14,20 +13,25 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.unitedlands.combat.player.PvpPlayer;
+import org.unitedlands.combat.util.MessageProvider;
 import org.unitedlands.combat.util.Utils;
-
-import static org.unitedlands.combat.util.Utils.getMessage;
-import static org.unitedlands.combat.util.Utils.sendMessageList;
+import org.unitedlands.utils.Messenger;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PvPCmd implements CommandExecutor, TabCompleter {
 
     private final List<String> subcommandCompletes = Arrays.asList("status", "degrade", "mute", "on");
     private final List<String> toggleCompletes = Arrays.asList("on", "off");
+    private final MessageProvider messageProvider;
+
+    public PvPCmd(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
+    }
 
     @Nullable
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias,
@@ -70,45 +74,45 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
             } else if (args[0].equals("on")) {
                 if (pvpPlayer.isImmune()) {
                     pvpPlayer.expireImmunity();
-                    player.sendMessage(getMessage("immunity-removed"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.immunity-removed"), null, messageProvider.get("messages.prefix"));
                     return true;
                 }
-                player.sendMessage(getMessage("you-are-not-immune"));
+                Messenger.sendMessage(sender, messageProvider.get("messages.you-are-not-immune"), null, messageProvider.get("messages.prefix"));
             }
             else {
-                sendMessageList(player, "messages.help-message");
+                Messenger.sendMessage(sender, messageProvider.getList("messages.help-message"));
                 return true;
             }
         } else if (args.length == 2) {
             if (args[0].equals("degrade")) {
                 if (args[1].equals("on")) {
                     pvpPlayer.setDegradable(true);
-                    player.sendMessage(getMessage("pvp-degrade-enabled"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.pvp-degrade-enabled"), null, messageProvider.get("messages.prefix"));
                     return true;
                 } else if (args[1].equals("off")) {
                     pvpPlayer.setDegradable(false);
-                    player.sendMessage(getMessage("pvp-degrade-disabled"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.pvp-degrade-disabled"), null, messageProvider.get("messages.prefix"));
                     return true;
                 }
                 else {
-                    sendMessageList(player, "messages.help-message");
+                    Messenger.sendMessage(sender, messageProvider.getList("messages.help-message"));
                     return true;
                 }
             } else if (args[0].equals("status")) {
                 // Get the status of another player
                 var otherPlayer = Bukkit.getOfflinePlayer(args[1]);
                 if (!otherPlayer.hasPlayedBefore()) {
-                    sender.sendMessage(Utils.getMessage("unknown-player"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.unknown-player"), null, messageProvider.get("messages.prefix"));
                     return true;
                 }
                 returnPvPStatus(player, otherPlayer);
                 return true;
             } else {
-                sendMessageList(player, "messages.help-message");
+                Messenger.sendMessage(sender, messageProvider.getList("messages.help-message"));
                 return true;
             }
         } else {
-            sendMessageList(player, "messages.help-message");
+            Messenger.sendMessage(sender, messageProvider.getList("messages.help-message"));
             return true;
         }
 
@@ -118,24 +122,10 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
     private void returnPvPStatus(Player sender, OfflinePlayer player) {
         PvpPlayer pvpPlayer = new PvpPlayer(player);
         String status = pvpPlayer.getStatusKey();
+        Messenger.sendMessage(sender, messageProvider.get("messages.unknown-player"), 
+            Map.of("name", player.getName(), "status", status, "hostility", String.valueOf(pvpPlayer.getHostility())), 
+            messageProvider.get("messages.prefix"));
 
-        TextReplacementConfig nameReplacer = TextReplacementConfig.builder()
-                .match("<name>")
-                .replacement(player.getName())
-                .build();
-        TextReplacementConfig statusReplacer = TextReplacementConfig.builder()
-                .match("<status>")
-                .replacement(status)
-                .build();
-        TextReplacementConfig hostilityReplacer = TextReplacementConfig.builder()
-                .match("<hostility>")
-                .replacement(String.valueOf(pvpPlayer.getHostility()))
-                .build();
-
-        sender.sendMessage(getMessage("pvp-status")
-                .replaceText(nameReplacer)
-                .replaceText(statusReplacer)
-                .replaceText(hostilityReplacer));
     }
 
     private void setNotification(Player player, boolean value) {
@@ -143,9 +133,9 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
         NamespacedKey key = new NamespacedKey(Utils.getUnitedPvP(), "neutrality-notif");
         pdc.set(key, PersistentDataType.BYTE, value ? (byte) 0 : (byte) 1);
         if (value)
-            player.sendMessage(Utils.getMessage("muted-notif"));
+            Messenger.sendMessage(player, messageProvider.get("messages.muted-notif"), null, messageProvider.get("messages.prefix"));
         else
-            player.sendMessage(Utils.getMessage("unmuted-notif"));
+            Messenger.sendMessage(player, messageProvider.get("messages.unmuted-notif"), null, messageProvider.get("messages.prefix"));
     }
 
     private boolean hasNotification(Player player) {

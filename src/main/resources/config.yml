@@ -53,7 +53,7 @@ combat_tagger:
     # Enable to disable the boss bar function.
     enabled: true
     # Text displayed within the bossbar.
-    title: "§cIn Combat (§e§l%seconds%s§c)"
+    title: "<red>In Combat (<yellow><bold>%seconds%s<red>)"
     # Bossbar colour, only supports:
     # PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
     colour: "RED"
@@ -199,52 +199,52 @@ attr-swap-items:
 # This section has editable language configurations for plugin messages.
 
 messages:
-  prefix: "§c§lU§f§lL §7§lCombat §8§l» "
-  reload: "§2Plugin reloaded."
-  invalid-command: "§cInvalid command usage."
-  no-permission: '§2You don''t have permission to perform this command.'
+  prefix: "<bold><red>U</red><white>L</white> Combat <dark_gray>» </dark_gray></bold>"
+  reload: "<dark_green>Plugin reloaded."
+  invalid-command: "<red>Invalid command usage."
+  no-permission: '<dark_green>You don''t have permission to perform this command.'
   help-message:
-    - '§l§cUnited §fCombat'
-    - '§8/pvp degrade [on/off] §7Toggle hostility decrease every new Towny day.'
-    - '§8/pvp status [player] §7Show your current status and hostility points. Add a player name to display their status.'
-    - '§8/pvp mute §7Mute or unmute neutrality warning notifications.'
-    - '§8/pvp on §7Disable your new player immunity.'
-  in-combat: '§cYou can''t use that command while in combat!'
-  pvp-disabled: '§cPvP disabled!'
-  pvp-enabled: '§aPvP enabled.'
-  pvp-degrade-enabled: '§aEnabled hostility degradation.'
-  pvp-degrade-disabled: '§cDisabled hostility degradation.'
-  player-not-recognised: '§cPlayer not found.'
-  pvp-status: '§7<name>'' status is §e§l<status>§7, with §e§l<hostility> §7hostility points.'
-  you-are-immune: '§cYou are immune for §e§l<time>. §7Please do §8/pvp on §cto attack this player!'
-  target-immune: '§cPlayer is new is immune to attacks!'
-  immunity-removed: '§cYou are no longer immune to attacks, and can attack other players!'
-  you-are-not-immune: '§cYou are not immune to attacks!'
-  kicked-out-of-neutrality-mayor: '§cYour town is no longer neutral! You cannot change this as long as you have hostile residents in your town.'
-  kicked-out-of-neutrality-king: '§cYour nation is no longer neutral! You cannot change this as long as you have hostile towns in your nation!'
-  cannot-be-neutral: '§cYou cannot toggle your town neutrality! You have hostile players in your town, found players: §e§l<players>§c. You can mute this message using §8/pvp mute§7.'
-  cannot-be-neutral-nation: '§cYou cannot toggle your nation neutrality! You have hostile towns in your nation, found towns: §e§l<towns>§c. You can mute this message using §8/pvp mute§7.'
-  muted-notif: '§cNeutrality warning notifications have been muted! Run §8/pvp mute §cagain to unmute.'
-  unmuted-notif: '§aNeutrality warning notifications unmuted! Run §8/pvp mute §ato mute them again.'
-  kicked-out-of-neutrality: '§cYour town has lost neutrality due to your actions!'
-  unknown-player: '§cThe player could not be found.'
-  admin-pvp-degrade-enabled: '§aEnabled §7hostility degradation for player.'
-  admin-pvp-degrade-disabled: '§cDisabled §7hostility degradation for player.'
-  admin-immunity-removed: '§7The player''s immunity has been removed.'
-  admin-hostility-updated: '§7Hostility level for player updated.'
-  admin-player-not-immune: '§eThis player did not have immunity.'
+    - '<bold><red>United <white>Combat</bold>'
+    - '<dark_gray>/pvp degrade [on/off] <gray>Toggle hostility decrease every new Towny day.'
+    - '<dark_gray>/pvp status [player] <gray>Show your current status and hostility points. Add a player name to display their status.'
+    - '<dark_gray>/pvp mute <gray>Mute or unmute neutrality warning notifications.'
+    - '<dark_gray>/pvp on <gray>Disable your new player immunity.'
+  in-combat: '<red>You can''t use that command while in combat!'
+  pvp-disabled: '<red>PvP disabled!'
+  pvp-enabled: '<green>PvP enabled.'
+  pvp-degrade-enabled: '<green>Enabled hostility degradation.'
+  pvp-degrade-disabled: '<red>Disabled hostility degradation.'
+  player-not-recognised: '<red>Player not found.'
+  pvp-status: '<gray>{name}''s status is <yellow><bold>{status}</bold><gray>, with <yellow><bold>{hostility}</bold> <gray>hostility points.'
+  you-are-immune: '<red>You are immune for <yellow><bold>{time}</bold></yellow>. <gray>Please do <dark_gray>/pvp on <red>to attack this player!'
+  target-immune: '<red>Player is new is immune to attacks!'
+  immunity-removed: '<red>You are no longer immune to attacks, and can attack other players!'
+  you-are-not-immune: '<red>You are not immune to attacks!'
+  kicked-out-of-neutrality-mayor: '<red>Your town is no longer neutral! You cannot change this as long as you have hostile residents in your town.'
+  kicked-out-of-neutrality-king: '<red>Your nation is no longer neutral! You cannot change this as long as you have hostile towns in your nation!'
+  cannot-be-neutral: '<red>You cannot toggle your town neutrality! You have hostile players in your town, found players: <yellow><bold>{players}</bold><red>. You can mute this message using <dark_gray>/pvp mute<gray>.'
+  cannot-be-neutral-nation: '<red>You cannot toggle your nation neutrality! You have hostile towns in your nation, found towns: <yellow><bold>{towns}</bold><red>. You can mute this message using <dark_gray>/pvp mute<gray>.'
+  muted-notif: '<red>Neutrality warning notifications have been muted! Run <dark_gray>/pvp mute <red>again to unmute.'
+  unmuted-notif: '<green>Neutrality warning notifications unmuted! Run <dark_gray>/pvp mute <green>to mute them again.'
+  kicked-out-of-neutrality: '<red>Your town has lost neutrality due to your actions!'
+  unknown-player: '<red>The player could not be found.'
+  admin-pvp-degrade-enabled: '<green>Enabled <gray>hostility degradation for player.'
+  admin-pvp-degrade-disabled: '<red>Disabled <gray>hostility degradation for player.'
+  admin-immunity-removed: '<gray>The player''s immunity has been removed.'
+  admin-hostility-updated: '<gray>Hostility level for player updated.'
+  admin-player-not-immune: '<yellow>This player did not have immunity.'
   admin-help-message:
-    - '§l§cUnited §fCombat §7Admin Commmands'
-    - '§8/ca [player] degrade [on/off] §7Toggles the player''s hostility decrease every new Towny day.'
-    - '§8/ca [player] sethostility [1-21] §7Sets the player''s hostility level.'
-    - '§8/ca [player] forcepvp §7Force-disables pvp immunity for new players.'
+    - '<bold><red>United <white>Combat <gray>Admin Commmands'
+    - '<dark_gray>/ca [player] degrade [on/off] <gray>Toggles the player''s hostility decrease every new Towny day.'
+    - '<dark_gray>/ca [player] sethostility [1-21] <gray>Sets the player''s hostility level.'
+    - '<dark_gray>/ca [player] forcepvp <gray>Force-disables pvp immunity for new players.'
 
 # +---------------------------------------------+ #
 # |              Combat Tagging                 | #
 # +---------------------------------------------+ #
 
-  combat-tagged: '§cYou are now in combat! Do not log out.'
-  combat-tagged-expired: '§aYou are no longer in combat.'
-  combat-tagged-blocked-command: '§cYou cannot use that command in combat.'
+  combat-tagged: '<red>You are now in combat! Do not log out.'
+  combat-tagged-expired: '<green>You are no longer in combat.'
+  combat-tagged-blocked-command: '<red>You cannot use that command in combat.'
   # {0} is the opponent's username.
-  combat-tagged-opponent-logout: '§e§l{0} §alogged out, you are no longer in combat.'
+  combat-tagged-opponent-logout: '<yellow><bold>{0} <green>logged out, you are no longer in combat.'

@@ -11,7 +11,6 @@ import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
@@ -28,18 +27,23 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.unitedlands.combat.UnitedCombat;
 import org.unitedlands.combat.player.PvpPlayer;
+import org.unitedlands.combat.util.MessageProvider;
 import org.unitedlands.combat.util.Utils;
+import org.unitedlands.utils.Messenger;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TownyListener implements Listener {
     private final TownyAPI towny = TownyAPI.getInstance();
     private final UnitedCombat unitedCombat;
+    private final MessageProvider messageProvider;
 
-    public TownyListener(UnitedCombat unitedCombat) {
+    public TownyListener(UnitedCombat unitedCombat, MessageProvider messageProvider) {
         this.unitedCombat = unitedCombat;
+        this.messageProvider = messageProvider;
     }
 
 
@@ -56,12 +60,12 @@ public class TownyListener implements Listener {
         if (resident.isMayor()) {
             List<String> hostilePlayers = getHostileResidents(resident.getTownOrNull().getResidents());
             if (!hostilePlayers.isEmpty())
-                sendListedMessage(player, "cannot-be-neutral", "<players>", hostilePlayers);
+                sendListedMessage(player, "cannot-be-neutral", "players", hostilePlayers);
         }
         if (resident.isKing()) {
             List<String> hostileTowns = getHostileTowns(resident.getNationOrNull());
             if (!hostileTowns.isEmpty())
-                sendListedMessage(player, "cannot-be-neutral-nation", "<towns>", hostileTowns);
+                sendListedMessage(player, "cannot-be-neutral-nation", "towns", hostileTowns);
         }
     }
 
@@ -89,17 +93,11 @@ public class TownyListener implements Listener {
 
         event.setCancelled(true);
         event.getTown().setNeutral(false);
-        sendListedMessage(event.getPlayer(), "cannot-be-neutral", "<players>", hostileResidents);
+        sendListedMessage(event.getPlayer(), "cannot-be-neutral", "players", hostileResidents);
     }
 
     private void sendListedMessage(Player player, String message, String pattern, List<String> list) {
-        TextReplacementConfig playerReplacer = TextReplacementConfig
-                .builder()
-                .match(pattern)
-                // Join all found hostile residents in the list.
-                .replacement(String.join("§7,§e ", list))
-                .build();
-        player.sendMessage(Utils.getMessage(message).replaceText(playerReplacer));
+        Messenger.sendMessage(player, messageProvider.get("messages." + message), Map.of(pattern, "<yellow>" + String.join("<gray>,</gray> ", list) + "</yellow>") , null);
     }
 
     @NotNull
@@ -131,7 +129,7 @@ public class TownyListener implements Listener {
         List<String> hostileTowns = getHostileTowns(nation);
         if (hostileTowns.isEmpty())
             return;
-        sendListedMessage(event.getPlayer(), "cannot-be-neutral-nation", "<towns>", hostileTowns);
+        sendListedMessage(event.getPlayer(), "cannot-be-neutral-nation", "towns", hostileTowns);
         nation.setNeutral(false);
         event.setCancelled(true);
     }
@@ -185,7 +183,7 @@ public class TownyListener implements Listener {
                 return;
             town.setNeutral(false);
             if (town.getMayor().isOnline()) {
-                town.getMayor().getPlayer().sendMessage(Utils.getMessage("kicked-out-of-neutrality-mayor"));
+                Messenger.sendMessage(town.getMayor().getPlayer(), messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null, messageProvider.get("messages.prefix"));
             }
         });
     }
@@ -196,7 +194,7 @@ public class TownyListener implements Listener {
                 nation.setNeutral(false);
                 Player king = nation.getKing().getPlayer();
                 if (king != null) {
-                    king.sendMessage(Utils.getMessage("kicked-out-of-neutrality-king"));
+                    Messenger.sendMessage(king, messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null, messageProvider.get("messages.prefix"));
                 }
             }
         }

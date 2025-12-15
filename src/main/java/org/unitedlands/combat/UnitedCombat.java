@@ -15,6 +15,7 @@ import org.unitedlands.combat.hooks.Placeholders;
 import org.unitedlands.combat.listeners.*;
 import org.unitedlands.combat.listeners.interfaces.IGraveListener;
 import org.unitedlands.combat.tagger.CombatTagManager;
+import org.unitedlands.combat.util.MessageProvider;
 import org.unitedlands.utils.Logger;
 import org.unitedlands.combat.tagger.CombatTagBossbar;
 
@@ -36,21 +37,26 @@ public final class UnitedCombat extends JavaPlugin {
     private CombatTagBossbar combatTagBossbar;
     private FlightListener flightListener;
 
+    private MessageProvider messageProvider;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        combatTagManager = new CombatTagManager(this);
+
+        messageProvider = new MessageProvider(getConfig());
+
+        combatTagManager = new CombatTagManager(this, messageProvider);
         combatTagBossbar = new CombatTagBossbar(this, combatTagManager);
         flightListener = new FlightListener(combatTagManager);
         registerListeners();
 
-        ReloadCmd reloadCmd = new ReloadCmd(this);
+        ReloadCmd reloadCmd = new ReloadCmd(this, messageProvider);
         registerCommand("unitedcombat", reloadCmd, reloadCmd);
 
-        AdminCmd adminCmd = new AdminCmd(this);
+        AdminCmd adminCmd = new AdminCmd(this, messageProvider);
         registerCommand("combatadmin", adminCmd, adminCmd);
 
-        PvPCmd pvpCmd = new PvPCmd();
+        PvPCmd pvpCmd = new PvPCmd(messageProvider);
         registerCommand("pvp", pvpCmd, pvpCmd);
 
     }
@@ -58,10 +64,10 @@ public final class UnitedCombat extends JavaPlugin {
     private void registerListeners() {
 
         PluginManager pluginManager = Bukkit.getServer().getPluginManager();
-        pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new TownyListener(this), this);
+        pluginManager.registerEvents(new PlayerListener(this, messageProvider), this);
+        pluginManager.registerEvents(new TownyListener(this, messageProvider), this);
         pluginManager.registerEvents(new ExplosionListener(getConfig()), this);
-        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar, flightListener), this);
+        pluginManager.registerEvents(new CombatTagListener(combatTagManager, combatTagBossbar, flightListener, messageProvider), this);
         pluginManager.registerEvents(flightListener, this);
 
         IGraveListener gravesListener = null;
@@ -95,8 +101,16 @@ public final class UnitedCombat extends JavaPlugin {
         combatTagBossbar.reload();
         unregisterListeners();
         registerListeners();
+
+        messageProvider.reload(getConfig());
+
         getLogger().info("Plugin configuration reloaded.");
     }
+
+    public MessageProvider getMessageProvider() {
+        return messageProvider;
+    }
+
 
     @Override
     public void onDisable() {

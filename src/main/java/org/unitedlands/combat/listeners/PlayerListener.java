@@ -7,7 +7,6 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 
-import net.kyori.adventure.text.TextReplacementConfig;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -35,21 +34,25 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.unitedlands.combat.UnitedCombat;
 import org.unitedlands.combat.player.PvpPlayer;
+import org.unitedlands.combat.util.MessageProvider;
 import org.unitedlands.combat.util.Utils;
+import org.unitedlands.utils.Messenger;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerListener implements Listener {
     private final UnitedCombat unitedCombat;
+    private final MessageProvider messageProvider;
     private final TownyAPI towny = TownyAPI.getInstance();
     HashMap<EnderCrystal, UUID> crystalMap = new HashMap<>();
 
-    public PlayerListener(UnitedCombat unitedCombat) {
+    public PlayerListener(UnitedCombat unitedCombat, MessageProvider messageProvider) {
         this.unitedCombat = unitedCombat;
+        this.messageProvider = messageProvider;
     }
 
     @EventHandler
@@ -90,12 +93,11 @@ public class PlayerListener implements Listener {
         // Kick them out and notify them
         if (town.isNeutral()) {
             town.setNeutral(false);
-            player.sendMessage(Utils.getMessage("kicked-out-of-neutrality"));
+            Messenger.sendMessage(player, messageProvider.get("messages.kicked-out-of-neutrality"), null, messageProvider.get("messages.prefix"));
             // Notify the mayor if they're online
             Resident mayor = town.getMayor();
             if (mayor.isOnline()) {
-                Objects.requireNonNull(mayor.getPlayer())
-                        .sendMessage(Utils.getMessage("kicked-out-of-neutrality-mayor"));
+                Messenger.sendMessage(mayor.getPlayer(), messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null, messageProvider.get("messages.prefix"));
             }
         }
         if (town.hasNation()) {
@@ -104,7 +106,7 @@ public class PlayerListener implements Listener {
                 nation.setNeutral(false);
                 Player king = nation.getKing().getPlayer();
                 if (king != null) {
-                    king.sendMessage(Utils.getMessage("kicked-out-of-neutrality-king"));
+                    Messenger.sendMessage(king, messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null, messageProvider.get("messages.prefix"));
                 }
             }
         }
@@ -123,17 +125,13 @@ public class PlayerListener implements Listener {
 
             if (pvpTarget.isImmune()) {
                 event.setCancelled(true);
-                damager.sendMessage(Utils.getMessage("target-immune"));
+                Messenger.sendMessage(damager, messageProvider.get("messages.target-immune"), null, messageProvider.get("messages.prefix"));
             }
 
             if (pvpDamager.isImmune()) {
                 event.setCancelled(true);
-                TextReplacementConfig timeReplacer = TextReplacementConfig.builder()
-                        .match("<time>")
-                        .replacement(DurationFormatUtils
-                                .formatDuration(TimeUnit.DAYS.toMillis(1) - pvpDamager.getImmunityTime(), "HH:mm:ss"))
-                        .build();
-                damager.sendMessage(Utils.getMessage("you-are-immune").replaceText(timeReplacer));
+                Messenger.sendMessage(damager, messageProvider.get("messages.you-are-immune"), Map.of("time", DurationFormatUtils
+                                .formatDuration(TimeUnit.DAYS.toMillis(1) - pvpDamager.getImmunityTime(), "HH:mm:ss")), messageProvider.get("messages.prefix"));
             }
 
             if (damager.getInventory().getItemInMainHand().getType() == Material.MACE) {
@@ -280,7 +278,7 @@ public class PlayerListener implements Listener {
                 PvpPlayer pvpPlayer = new PvpPlayer(nearbyPlayer);
                 if (pvpPlayer.isImmune()) {
                     event.setCancelled(true);
-                    player.sendMessage(Utils.getMessage("target-immune"));
+                    Messenger.sendMessage(player, messageProvider.get("messages.target-immune"), null, messageProvider.get("messages.prefix"));
                 }
             }
         }
