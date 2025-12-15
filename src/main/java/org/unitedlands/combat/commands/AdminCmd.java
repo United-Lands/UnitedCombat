@@ -11,10 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.unitedlands.combat.UnitedCombat;
 import org.unitedlands.combat.player.PvpPlayer;
-import org.unitedlands.combat.util.Utils;
-
-import static org.unitedlands.combat.util.Utils.getMessage;
-import static org.unitedlands.combat.util.Utils.sendMessageList;
+import org.unitedlands.combat.util.MessageProvider;
+import org.unitedlands.utils.Messenger;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,9 +22,11 @@ import java.util.stream.Collectors;
 public class AdminCmd implements CommandExecutor, TabCompleter {
 
     private final UnitedCombat plugin;
+    private final MessageProvider messageProvider;
 
-    public AdminCmd(UnitedCombat plugin) {
+    public AdminCmd(UnitedCombat plugin, MessageProvider messageProvider) {
         this.plugin = plugin;
+        this.messageProvider = messageProvider;
     }
 
     private final List<String> subcommandCompletes = Arrays.asList("forcepvp", "degrade", "sethostility");
@@ -72,21 +72,22 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             @NotNull String @NotNull [] args) {
         plugin.getConfig();
 
-        if (!((Player) sender).hasPermission("united.combat.admin")) {
-            sender.sendMessage(Utils.getMessage("no-permission"));
+        if (!sender.hasPermission("united.combat.admin")) {
+            Messenger.sendMessage(sender, messageProvider.get("messages.no-permission"), null,
+                    messageProvider.get("messages.prefix"));
             return true;
         }
 
         // We need at least one username and one subcommand
         if (args.length < 2) {
-            sendMessageList((Player) sender, "messages.admin-help-message");
+            Messenger.sendMessage(sender, messageProvider.getList("messages.admin-help-message"));
             return true;
         }
 
         // Get the subject player the command is used on
         OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
         if (!player.hasPlayedBefore()) {
-            sender.sendMessage(Utils.getMessage("unknown-player"));
+            Messenger.sendMessage(sender, messageProvider.get("messages.unknown-player"), null, messageProvider.get("messages.prefix"));
             return true;
         }
 
@@ -96,41 +97,41 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             if (args[1].equalsIgnoreCase("sethostility")) {
                 var newLevel = Integer.parseInt(args[2]);
                 pvpPlayer.setHostility(newLevel);
-                sender.sendMessage(getMessage("admin-hostility-updated"));
+                Messenger.sendMessage(sender, messageProvider.get("messages.admin-hostility-updated"), null, messageProvider.get("messages.prefix"));
                 return true;
             } else if (args[1].equalsIgnoreCase("degrade")) {
                 if (args[2].equalsIgnoreCase("on")) {
                     pvpPlayer.setDegradable(true);
-                    sender.sendMessage(getMessage("admin-pvp-degrade-enabled"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.admin-pvp-degrade-enabled"), null, messageProvider.get("messages.prefix"));
                     return true;
                 } else if (args[2].equalsIgnoreCase("off")) {
                     pvpPlayer.setDegradable(false);
-                    sender.sendMessage(getMessage("admin-pvp-degrade-disabled"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.admin-pvp-degrade-disabled"), null, messageProvider.get("messages.prefix"));
                     return true;
                 } else {
-                    sendMessageList((Player) sender, "messages.admin-help-message");
+                    Messenger.sendMessage(sender, messageProvider.getList("messages.admin-help-message"));
                     return true;
                 }
             } else {
-                sendMessageList((Player)sender, "messages.admin-help-message");
-                return true;    
+                Messenger.sendMessage(sender, messageProvider.getList("messages.admin-help-message"));
+                return true;
             }
         } else if (args.length == 2) {
             if (args[1].equals("forcepvp")) {
                 if (pvpPlayer.isImmune()) {
                     pvpPlayer.expireImmunity();
-                    sender.sendMessage(getMessage("admin-immunity-removed"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.admin-immunity-removed"), null, messageProvider.get("messages.prefix"));
                     return true;
                 } else {
-                    sender.sendMessage(getMessage("admin-player-not-immune"));
+                    Messenger.sendMessage(sender, messageProvider.get("messages.admin-player-not-immune"), null, messageProvider.get("messages.prefix"));
                     return true;
                 }
             } else {
-                sendMessageList((Player)sender, "messages.admin-help-message");
-                return true;    
+                Messenger.sendMessage(sender, messageProvider.getList("messages.admin-help-message"));
+                return true;
             }
         } else {
-            sendMessageList((Player) sender, "messages.admin-help-message");
+            Messenger.sendMessage(sender, messageProvider.getList("messages.admin-help-message"));
             return true;
         }
     }

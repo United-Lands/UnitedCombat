@@ -6,7 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.unitedlands.combat.UnitedCombat;
-import org.unitedlands.combat.util.Utils;
+import org.unitedlands.combat.util.MessageProvider;
+import org.unitedlands.utils.Messenger;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ public final class CombatTagManager {
     public JavaPlugin getPlugin() { return plugin; }
 
     private final JavaPlugin plugin;
+    private final MessageProvider messageProvider;
 
     private final Map<UUID, Long> expiryByPlayer =  new HashMap<>();
     private final Map<UUID, UUID> lastOpponent = new HashMap<>();
@@ -30,8 +32,9 @@ public final class CombatTagManager {
     private boolean punishmentEscalation;
     private List<List<String>> punishmentSteps;
 
-    public CombatTagManager(UnitedCombat plugin) {
+    public CombatTagManager(UnitedCombat plugin, MessageProvider messageProvider) {
         this.plugin = plugin;
+        this.messageProvider = messageProvider;
         reload();
     }
 
@@ -116,7 +119,7 @@ public final class CombatTagManager {
         if (now >= expiry) {
 
             // Notify player and log
-            p.sendMessage(Utils.getMessage("combat-tagged-expired"));
+            Messenger.sendMessage(p, messageProvider.get("messages.combat-tagged-expired"), null, messageProvider.get("messages.prefix"));
             plugin.getLogger().info(String.format(
                     "Combat Tag expired for %s in world %s due to timeout.",
                     p.getName(),
@@ -150,7 +153,7 @@ public final class CombatTagManager {
         if (p == null) return;
 
         if (expiryByPlayer.remove(p.getUniqueId()) != null) {
-            p.sendMessage(Utils.getMessage("combat-tagged-expired"));
+            Messenger.sendMessage(p, messageProvider.get("messages.combat-tagged-expired"), null, messageProvider.get("messages.prefix"));
             plugin.getLogger().info(String.format(
                     "Combat Tag cleared for %s in world %s due to death",
                     p.getName(),

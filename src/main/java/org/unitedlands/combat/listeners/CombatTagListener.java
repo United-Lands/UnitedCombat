@@ -14,19 +14,25 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.unitedlands.combat.tagger.CombatTagBossbar;
 import org.unitedlands.combat.tagger.CombatTagManager;
+import org.unitedlands.combat.util.MessageProvider;
 import org.unitedlands.combat.util.Utils;
+import org.unitedlands.utils.Messenger;
 
 import java.util.Locale;
+import java.util.Map;
 
 public class CombatTagListener implements Listener {
     private final CombatTagManager tags;
     private final CombatTagBossbar bossbar;
     private final FlightListener flight;
 
-    public CombatTagListener(CombatTagManager tags, CombatTagBossbar combatTagBossbar, FlightListener flight) {
+    private final MessageProvider messageProvider;
+
+    public CombatTagListener(CombatTagManager tags, CombatTagBossbar combatTagBossbar, FlightListener flight, MessageProvider messageProvider) {
         this.tags = tags;
         this.bossbar = combatTagBossbar;
         this.flight = flight;
+        this.messageProvider = messageProvider;
     }
 
     // Tag for combat when taking PvP damage, attacker and victim.
@@ -65,10 +71,11 @@ public class CombatTagListener implements Listener {
         }
 
         if (!victimWasTagged && tags.isTagged(victim)) {
-            victim.sendMessage(Utils.getMessage("combat-tagged"));
+            Messenger.sendMessage(victim, messageProvider.get("messages.combat-tagged"), null, messageProvider.get("messages.prefix"));
+
         }
         if (!attackerWasTagged && tags.isTagged(attacker)) {
-            attacker.sendMessage(Utils.getMessage("combat-tagged"));
+            Messenger.sendMessage(attacker, messageProvider.get("messages.combat-tagged"), null, messageProvider.get("messages.prefix"));
         }
     }
 
@@ -90,7 +97,7 @@ public class CombatTagListener implements Listener {
             ));
 
             e.setCancelled(true);
-            p.sendMessage(Utils.getMessage("combat-tagged-blocked-command"));
+            Messenger.sendMessage(p, messageProvider.get("messages.combat-tagged-blocked-command"), null, messageProvider.get("messages.prefix"));
         }
     }
 
@@ -114,11 +121,7 @@ public class CombatTagListener implements Listener {
         }
 
         if (opponentOnline) {
-            var rep = net.kyori.adventure.text.TextReplacementConfig.builder()
-                    .matchLiteral("{0}")
-                    .replacement(quitter.getName())
-                    .build();
-            opponent.sendMessage(org.unitedlands.combat.util.Utils.getMessage("combat-tagged-opponent-logout").replaceText(rep));
+            Messenger.sendMessage(opponent, messageProvider.get("messages.combat-tagged-opponent-logout"), Map.of("0", quitter.getName()), messageProvider.get("messages.prefix"));
         }
 
         Utils.getUnitedPvP().getLogger().info(String.format(
@@ -163,7 +166,7 @@ public class CombatTagListener implements Listener {
             case COMMAND:
             case PLUGIN:
                 event.setCancelled(true);
-                player.sendMessage(Utils.getMessage("combat-tagged-blocked-command"));
+                Messenger.sendMessage(player, messageProvider.get("messages.combat-tagged-blocked-command"), null, messageProvider.get("messages.prefix"));
                 break;
             default:
                 // Allow other teleport types like ender pearls, portals, death, etc.
