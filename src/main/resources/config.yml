@@ -217,6 +217,7 @@ messages:
   player-not-recognised: '<red>Player not found.'
   pvp-status: '<gray>{name}''s status is <yellow><bold>{status}</bold><gray>, with <yellow><bold>{hostility}</bold> <gray>hostility points.'
   you-are-immune: '<red>You are immune for <yellow><bold>{time}</bold></yellow>. <gray>Please do <dark_gray>/pvp on <red>to attack this player!'
+  inventory-kept: '<aqua>You have kept your inventory because you are still in your immunity phase (<yellow><bold>{time}</bold></yellow> left)'
   target-immune: '<red>Player is new is immune to attacks!'
   immunity-removed: '<red>You are no longer immune to attacks, and can attack other players!'
   you-are-not-immune: '<red>You are not immune to attacks!'

@@ -122,7 +122,7 @@ public class PvPCmd implements CommandExecutor, TabCompleter {
     private void returnPvPStatus(Player sender, OfflinePlayer player) {
         PvpPlayer pvpPlayer = new PvpPlayer(player);
         String status = pvpPlayer.getStatusKey();
-        Messenger.sendMessage(sender, messageProvider.get("messages.unknown-player"), 
+        Messenger.sendMessage(sender, messageProvider.get("messages.pvp-status"), 
             Map.of("name", player.getName(), "status", status, "hostility", String.valueOf(pvpPlayer.getHostility())), 
             messageProvider.get("messages.prefix"));
 

@@ -93,11 +93,13 @@ public class PlayerListener implements Listener {
         // Kick them out and notify them
         if (town.isNeutral()) {
             town.setNeutral(false);
-            Messenger.sendMessage(player, messageProvider.get("messages.kicked-out-of-neutrality"), null, messageProvider.get("messages.prefix"));
+            Messenger.sendMessage(player, messageProvider.get("messages.kicked-out-of-neutrality"), null,
+                    messageProvider.get("messages.prefix"));
             // Notify the mayor if they're online
             Resident mayor = town.getMayor();
             if (mayor.isOnline()) {
-                Messenger.sendMessage(mayor.getPlayer(), messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null, messageProvider.get("messages.prefix"));
+                Messenger.sendMessage(mayor.getPlayer(), messageProvider.get("messages.kicked-out-of-neutrality-mayor"),
+                        null, messageProvider.get("messages.prefix"));
             }
         }
         if (town.hasNation()) {
@@ -106,7 +108,8 @@ public class PlayerListener implements Listener {
                 nation.setNeutral(false);
                 Player king = nation.getKing().getPlayer();
                 if (king != null) {
-                    Messenger.sendMessage(king, messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null, messageProvider.get("messages.prefix"));
+                    Messenger.sendMessage(king, messageProvider.get("messages.kicked-out-of-neutrality-mayor"), null,
+                            messageProvider.get("messages.prefix"));
                 }
             }
         }
@@ -125,13 +128,16 @@ public class PlayerListener implements Listener {
 
             if (pvpTarget.isImmune()) {
                 event.setCancelled(true);
-                Messenger.sendMessage(damager, messageProvider.get("messages.target-immune"), null, messageProvider.get("messages.prefix"));
+                Messenger.sendMessage(damager, messageProvider.get("messages.target-immune"), null,
+                        messageProvider.get("messages.prefix"));
             }
 
             if (pvpDamager.isImmune()) {
                 event.setCancelled(true);
-                Messenger.sendMessage(damager, messageProvider.get("messages.you-are-immune"), Map.of("time", DurationFormatUtils
-                                .formatDuration(TimeUnit.DAYS.toMillis(1) - pvpDamager.getImmunityTime(), "HH:mm:ss")), messageProvider.get("messages.prefix"));
+                Messenger.sendMessage(damager, messageProvider.get("messages.you-are-immune"),
+                        Map.of("time", DurationFormatUtils
+                                .formatDuration(TimeUnit.DAYS.toMillis(1) - pvpDamager.getImmunityTime(), "HH:mm:ss")),
+                        messageProvider.get("messages.prefix"));
             }
 
             if (damager.getInventory().getItemInMainHand().getType() == Material.MACE) {
@@ -227,6 +233,28 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onImmunePlayerDeath(PlayerDeathEvent event) {
+        Player victim = event.getEntity();
+        var pvpPlayer = new PvpPlayer(victim);
+
+        // If the player is in their immunity period, let them keep their inventory on
+        // death.
+        if (pvpPlayer.isImmune()) {
+            event.setKeepInventory(true);
+            event.setKeepLevel(true);
+
+            var drops = event.getDrops();
+            drops.clear();
+
+            Messenger.sendMessage(victim, messageProvider.get("messages.inventory-kept"),
+                Map.of("time", DurationFormatUtils
+                        .formatDuration(TimeUnit.DAYS.toMillis(1) - pvpPlayer.getImmunityTime(), "HH:mm:ss")),
+                    messageProvider.get("messages.prefix"));
+        }
+
+    }
+
+    @EventHandler
     public void onPlayerDeathByCrystal(PlayerDeathEvent event) {
         Player victim = event.getEntity();
 
@@ -278,7 +306,8 @@ public class PlayerListener implements Listener {
                 PvpPlayer pvpPlayer = new PvpPlayer(nearbyPlayer);
                 if (pvpPlayer.isImmune()) {
                     event.setCancelled(true);
-                    Messenger.sendMessage(player, messageProvider.get("messages.target-immune"), null, messageProvider.get("messages.prefix"));
+                    Messenger.sendMessage(player, messageProvider.get("messages.target-immune"), null,
+                            messageProvider.get("messages.prefix"));
                 }
             }
         }
