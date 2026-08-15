@@ -44,10 +44,9 @@ public final class UnitedCombat extends JavaPlugin {
         saveDefaultConfig();
 
         messageProvider = new MessageProvider(getConfig());
-
         combatTagManager = new CombatTagManager(this, messageProvider);
         combatTagBossbar = new CombatTagBossbar(this, combatTagManager);
-        flightListener = new FlightListener(combatTagManager);
+        flightListener = new FlightListener(combatTagManager, messageProvider);
         registerListeners();
 
         ReloadCmd reloadCmd = new ReloadCmd(this, messageProvider);

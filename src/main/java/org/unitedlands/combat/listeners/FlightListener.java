@@ -1,16 +1,15 @@
 package org.unitedlands.combat.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRiptideEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.*;
 import org.unitedlands.combat.tagger.CombatTagManager;
+import org.unitedlands.combat.util.MessageProvider;
+import org.unitedlands.utils.Messenger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +24,11 @@ public class FlightListener implements Listener {
     private boolean elytraFlightEnabled;
     private boolean softLandingEnabled;
 
-    public FlightListener(CombatTagManager tags) {
+    private final MessageProvider messageProvider;
+
+    public FlightListener(CombatTagManager tags, MessageProvider messageProvider) {
         this.tags = tags;
+        this.messageProvider = messageProvider;
         reload();
     }
 
@@ -80,25 +82,33 @@ public class FlightListener implements Listener {
         if (!(e.getEntity() instanceof Player p)) return;
         if (e.isGliding() && tags.isTagged(p)) {
             e.setCancelled(true);
+            Messenger.sendMessage(p, messageProvider.get("messages.combat-tagged-blocked-elytra"), null, messageProvider.get("messages.prefix"));
         }
     }
 
-    // Block the player activating their elytra through the riptide enchantment of a trident.
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    // Cancel riptides and send warning.
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRiptide(PlayerRiptideEvent e) {
         if (!elytraFlightEnabled) return;
         Player p = e.getPlayer();
         if (!tags.isTagged(p)) return;
 
-        // Reset their velocity to cancel any movement.
-        Bukkit.getScheduler().runTask(tags.getPlugin(), () -> {
-            p.setVelocity(p.getVelocity().zero());
-            // Extra guard against elytra opening.
-            if (p.isGliding()) p.setGliding(false);
-            if (softLandingEnabled) {
-                softLanding.add(p.getUniqueId());
-            }
-        });
+        Messenger.sendMessage(p, messageProvider.get("messages.combat-tagged-blocked-trident"), null, messageProvider.get("messages.prefix"));
+
+        if (p.isGliding()) p.setGliding(false);
+        if (softLandingEnabled) {
+            softLanding.add(p.getUniqueId());
+        }
+    }
+
+    // Lock player movement during attempted riptide.
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRiptideMove(PlayerMoveEvent e) {
+        if (!elytraFlightEnabled) return;
+        Player p = e.getPlayer();
+        if (!p.isRiptiding()) return;
+        if (!tags.isTagged(p)) return;
+        e.setCancelled(true);
     }
 
     // Cancel any initial damage from falling.

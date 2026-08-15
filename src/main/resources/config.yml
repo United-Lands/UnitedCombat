@@ -65,6 +65,7 @@ combat_tagger:
     linger: 1000
 
   # Flight control settings.
+  # TRUE means disabled behaviour, FALSE means enabled.
   flight:
     # Enable or disable plugin or command flight during combat.
     plugin-flight: true
@@ -247,5 +248,7 @@ messages:
   combat-tagged: '<red>You are now in combat! Do not log out.'
   combat-tagged-expired: '<green>You are no longer in combat.'
   combat-tagged-blocked-command: '<red>You cannot use that command in combat.'
+  combat-tagged-blocked-elytra: '<red>You cannot use elytras in combat.'
+  combat-tagged-blocked-trident: '<red>You cannot use riptide in combat.'
   # {0} is the opponent's username.
   combat-tagged-opponent-logout: '<yellow><bold>{0} <green>logged out, you are no longer in combat.'
