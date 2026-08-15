@@ -4,15 +4,15 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.unitedlands</groupId>
+    <groupId>org.unitedlands</groupId>
     <artifactId>UnitedCombat</artifactId>
-    <version>3.6.1</version>
+    <version>3.6.2</version>
     <packaging>jar</packaging>
 
     <name>UnitedCombat</name>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -22,10 +22,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.15.0</version>
                 <configuration>
-                    <release>21</release>
-                    <target>21</target>
+                    <release>25</release>
+                    <target>25</target>
                 </configuration>
             </plugin>
 
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.10-R0.1-SNAPSHOT</version>
+            <version>[26.2.build,)</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>towny</artifactId>
-            <version>0.102.0.0</version>
+            <version>0.103.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
