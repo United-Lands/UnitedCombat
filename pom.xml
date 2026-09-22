@@ -12,16 +12,12 @@
     </parent>
 
     <artifactId>UnitedCombat</artifactId>
-    <version>3.6.2</version>
+    <version>3.6.3</version>
 
     <repositories>
         <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-        <repository>
-            <id>jeff-media-public</id>
-            <url>https://repo.jeff-media.com/public/</url>
         </repository>
         <repository>
             <id>Artillex-Studios</id>
@@ -47,11 +43,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>de.jeff_media</groupId>
-            <artifactId>AngelChestAPI</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.Gecolay.GSit</groupId>
             <artifactId>core</artifactId>
             <version>3.3.1</version>
@@ -65,6 +56,7 @@
         <dependency>
             <groupId>com.artillexstudios</groupId>
             <artifactId>AxGraves</artifactId>
+            <version>1.22.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

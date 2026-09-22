@@ -70,11 +70,6 @@ public final class UnitedCombat extends JavaPlugin {
         pluginManager.registerEvents(flightListener, this);
 
         IGraveListener gravesListener = null;
-        Plugin angelChest = Bukkit.getPluginManager().getPlugin("AngelChest");
-        if (angelChest != null && angelChest.isEnabled()) {
-            Logger.log("[UnitedCombat] AngelChest found, enabling integration.");
-            gravesListener = new AngelChestGraveListener();
-        }
         Plugin axGraves = Bukkit.getPluginManager().getPlugin("AxGraves");
         if (axGraves != null && axGraves.isEnabled()) {
             Logger.log("[UnitedCombat] AxGraves found, enabling integration.");
